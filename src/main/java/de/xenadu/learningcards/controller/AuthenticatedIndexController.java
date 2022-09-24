@@ -1,6 +1,7 @@
 package de.xenadu.learningcards.controller;
 
 import io.quarkus.oidc.IdToken;
+import io.quarkus.oidc.OidcSession;
 import io.quarkus.oidc.RefreshToken;
 import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -10,12 +11,11 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
-@Path("")
+@Path("/api")
 @Authenticated
 @NoCache
-public class IndexController {
+public class AuthenticatedIndexController {
 
     /**
      * Injection point for the ID Token issued by the OpenID Connect Provider
@@ -35,6 +35,17 @@ public class IndexController {
      */
     @Inject
     RefreshToken refreshToken;
+
+    @Inject
+    OidcSession oidcSession;
+
+//    @GET
+//    @Path("/logout")
+//    public String logout() {
+//        final UniAwait<Void> await = oidcSession.logout().await();
+//        await.indefinitely();
+//        return "you are logged out";
+//    }
 
     /**
      * Returns the tokens available to the application. This endpoint exists only for demonstration purposes, you should not
