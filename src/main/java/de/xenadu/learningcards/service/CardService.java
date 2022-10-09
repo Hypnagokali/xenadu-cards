@@ -30,4 +30,20 @@ public class CardService {
     public List<Card> findAllByRepState(int repState) {
         return cardRepository.findByRepetitionState(repState);
     }
+
+    @Transactional
+    public Card saveCard(Card card) {
+        if (card.getId() > 0) {
+            cardRepository.getEntityManager().merge(card);
+        } else {
+            cardRepository.persist(card);
+        }
+
+
+        return card;
+    }
+
+    public Card getById(long id) {
+        return cardRepository.findById(id);
+    }
 }

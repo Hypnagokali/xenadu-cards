@@ -5,7 +5,8 @@ import io.quarkus.oidc.OidcSession;
 import io.quarkus.oidc.RefreshToken;
 import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.jboss.resteasy.annotations.cache.NoCache;
+import org.jboss.resteasy.reactive.NoCache;
+
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -62,8 +63,14 @@ public class AuthenticatedIndexController {
 
         Object userName = this.idToken.getClaim("preferred_username");
 
+        final Object email = this.idToken.getClaim("email");
+
+        if (email != null) {
+            response.append("<li>e-mail: ").append(email).append("</li>");
+        }
+
         if (userName != null) {
-            response.append("<li>username: ").append(userName.toString()).append("</li>");
+            response.append("<li>username: ").append(userName).append("</li>");
         }
 
         Object scopes = this.accessToken.getClaim("scope");

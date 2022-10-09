@@ -1,7 +1,9 @@
 package de.xenadu.learningcards.controller;
 
+import de.xenadu.learningcards.domain.UserInfo;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.service.CardService;
+import de.xenadu.learningcards.service.extern.api.UserService;
 import lombok.RequiredArgsConstructor;
 
 import javax.ws.rs.GET;
@@ -17,6 +19,14 @@ import java.util.List;
 public class CardController {
 
     private final CardService cardService;
+    private final UserService userService;
+
+    @GET
+    @Path("user")
+    @Produces(MediaType.APPLICATION_JSON)
+    public UserInfo testUserInfo() {
+        return userService.getUserByEmail("test@test.de");
+    }
 
     @GET
     @Path("/rep-state/{repState}")

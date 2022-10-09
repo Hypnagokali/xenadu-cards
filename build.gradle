@@ -17,14 +17,23 @@ dependencies {
     implementation 'io.quarkus:quarkus-oidc'
     implementation 'io.quarkus:quarkus-keycloak-authorization'
 
-    implementation 'io.quarkus:quarkus-undertow'
+    implementation 'io.quarkus:quarkus-smallrye-stork'
+    implementation 'io.smallrye.stork:stork-service-discovery-eureka'
+    implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+    implementation 'io.quarkus:quarkus-resteasy-reactive-jaxb'
+    implementation group: 'io.quarkus', name: 'quarkus-rest-client-reactive'
+
+
+//    implementation 'io.quarkus:quarkus-undertow'
     implementation 'io.quarkus:quarkus-jdbc-h2'
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
-    implementation 'io.quarkus:quarkus-resteasy-jackson'
+//    implementation 'io.quarkus:quarkus-resteasy-jackson'
     implementation 'io.quarkus:quarkus-arc'
 
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
+
 }
 
 group 'de.xenadu'

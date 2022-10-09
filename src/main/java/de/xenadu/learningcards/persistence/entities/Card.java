@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -22,6 +20,10 @@ public class Card extends PanacheEntityBase {
     private String front = "";
     private String back = "";
     private int repetitionState = 0;
+
+    @ManyToOne
+    @JoinColumn(name = "card_set_id")
+    private CardSet cardSet;
 
     public Card(String front, String back) {
         this.front = front;
