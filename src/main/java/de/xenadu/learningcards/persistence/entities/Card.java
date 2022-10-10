@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,6 +22,7 @@ public class Card extends PanacheEntityBase {
     private String front = "";
     private String back = "";
     private int repetitionState = 0;
+    private LocalDateTime lastLearned = LocalDateTime.of(1800, 1, 1, 0, 0);
 
     @ManyToOne
     @JoinColumn(name = "card_set_id")

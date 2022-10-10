@@ -4,6 +4,7 @@ import de.xenadu.learningcards.domain.UserInfo;
 import de.xenadu.learningcards.service.extern.ServiceInfo;
 import de.xenadu.learningcards.service.extern.ServiceLookup;
 import de.xenadu.learningcards.service.extern.api.UserService;
+import io.quarkus.security.UnauthorizedException;
 import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.mutiny.core.Vertx;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ServerErrorException;
 import java.time.Duration;
 
 @ApplicationScoped
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
                 .atMost(Duration.ofSeconds(10));
 
         if (userInfoHttpResponse == null) {
-            throw new BadRequestException("No response in 10 seconds error");
+            throw new ServerErrorException("No response in 10 seconds error", 500);
         }
 
         if (userInfoHttpResponse.statusCode() >= 300) {
