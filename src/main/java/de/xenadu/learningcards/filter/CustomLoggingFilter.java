@@ -1,4 +1,4 @@
-package de.xenadu.learningcards.logging;
+package de.xenadu.learningcards.filter;
 
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.client.spi.ResteasyReactiveClientRequestContext;
@@ -13,8 +13,8 @@ public class CustomLoggingFilter implements ResteasyReactiveClientRequestFilter 
 
     @Override
     public void filter(ResteasyReactiveClientRequestContext requestContext) {
-        logger.info("------------------------------");
-        logger.infof("Resolved address by Stork: %s", requestContext.getUri().toString());
+        logger.info("------------Outgoing Request----------------");
+        logger.infof(requestContext.getUri().toString());
 
     }
 }

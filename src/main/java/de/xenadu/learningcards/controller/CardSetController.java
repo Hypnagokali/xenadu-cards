@@ -3,6 +3,7 @@ package de.xenadu.learningcards.controller;
 import de.xenadu.learningcards.domain.UserInfo;
 import de.xenadu.learningcards.dto.CardSetDto;
 import de.xenadu.learningcards.dto.CardSetMapper;
+import de.xenadu.learningcards.exceptions.RestForbiddenException;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.service.CardSetService;
 import de.xenadu.learningcards.service.GetUserInfo;
@@ -10,6 +11,7 @@ import io.quarkus.security.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Comparator;
@@ -34,6 +36,11 @@ public class CardSetController {
         final CardSet cardSet = cardSetMapper.mapToEntity(cardSetDto);
 
         final UserInfo userInfo = getUserInfo.authenticatedUser();
+
+        if (cardSetDto.getUserId() != userInfo.getId()) {
+            throw new RestForbiddenException();
+        }
+
         return cardSetMapper.mapToDto(cardSetService.save(cardSet, userInfo));
     }
 
@@ -48,6 +55,17 @@ public class CardSetController {
                 .map(cardSetMapper::mapToDto)
                 .collect(Collectors.toList());
     }
+
+    @GET
+    @Path("/{cardSetId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public CardSetDto getCardSetById(@PathParam("cardSetId") long cardSetId) {
+        final UserInfo userInfo = getUserInfo.authenticatedUser();
+
+        return cardSetMapper.mapToDto(cardSetService.findById(cardSetId).orElseThrow(NotFoundException::new));
+    }
+
 
     @PUT
     @Path("/{cardSetId}")

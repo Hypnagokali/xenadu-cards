@@ -39,6 +39,17 @@ public class AuthenticatedIndexController {
     OidcSession oidcSession;
 
     @GET
+    @Path("/dev")
+    @Produces(MediaType.TEXT_PLAIN)
+    public void startDev(@Context HttpServletResponse response) {
+        try {
+            response.sendRedirect("http://localhost:8081");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GET
     @Path("/logout")
     @Produces(MediaType.TEXT_PLAIN)
     public String logout(@Context HttpServletResponse response) {

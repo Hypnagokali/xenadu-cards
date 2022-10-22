@@ -1,26 +1,40 @@
 package de.xenadu.learningcards.persistence.entities;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Card extends PanacheEntityBase {
+public class Card extends CreatedByAndTimestampAudit {
+
+    private static final String GENERATOR = "card_seq";
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = GENERATOR)
+    @SequenceGenerator(name = GENERATOR, sequenceName = GENERATOR, allocationSize = 1)
     private long id;
 
     private String front = "";
     private String back = "";
+    private boolean noun;
+
+    @Column(columnDefinition = "CHARACTER VARYING (12) DEFAULT 'n'")
+    private String gender = "n";
+
+    @Column(columnDefinition = "TEXT default ''")
+    private String additionalInfos = "";
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<HelpfulLink> helpfulLinks = new LinkedHashSet<>();
+
     private int repetitionState = 0;
     private LocalDateTime lastLearned = LocalDateTime.of(1800, 1, 1, 0, 0);
 
@@ -33,9 +47,20 @@ public class Card extends PanacheEntityBase {
         this.back = back;
     }
 
+    public Card(long id, String front, String back) {
+        this.id = id;
+        this.front = front;
+        this.back = back;
+    }
+
     public Card(String front, String back, int repState) {
         this.repetitionState = repState;
         this.front = front;
         this.back = back;
+    }
+
+    public void addLink(HelpfulLink helpfulLink) {
+        helpfulLink.setCard(this);
+        this.helpfulLinks.add(helpfulLink);
     }
 }

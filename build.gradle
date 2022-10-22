@@ -33,6 +33,8 @@ dependencies {
 //    implementation 'io.quarkus:quarkus-resteasy-jackson'
     implementation 'io.quarkus:quarkus-arc'
 
+    testImplementation group: 'org.jboss.weld', name: 'weld-junit5', version: '2.0.2.Final'
+
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'

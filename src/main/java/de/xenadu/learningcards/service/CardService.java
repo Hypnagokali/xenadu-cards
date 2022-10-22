@@ -2,36 +2,39 @@ package de.xenadu.learningcards.service;
 
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.repositories.CardRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @ApplicationScoped
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class CardService {
 
-    private final CardRepository cardRepository;
+    private CardRepository cardRepository;
 
-    @Transactional
-    public Card createCard(String front, String back) {
-        Card card = new Card();
-        card.setFront(front);
-        card.setBack(back);
-        card.setRepetitionState(0);
-
-        cardRepository.persist(card);
-
-        return card;
+    @Inject
+    public CardService(CardRepository cardRepository) {
+        this.cardRepository = cardRepository;
     }
 
+    public List<Card> findAllByRepState(long cardSetId, int repState) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("cardSetId", cardSetId);
+        params.put("repState", repState);
 
-    public List<Card> findAllByRepState(int repState) {
-        return cardRepository.findByRepetitionState(repState);
+        return cardRepository.list("cardSet.id = :cardSetId AND repetitionState = :repState", params);
     }
 
     @Transactional
+    // ToDo: Returned value not needed
     public Card saveCard(Card card) {
         if (card.getId() > 0) {
             cardRepository.getEntityManager().merge(card);
@@ -45,5 +48,13 @@ public class CardService {
 
     public Card getById(long id) {
         return cardRepository.findById(id);
+    }
+
+    public Optional<Card> findById(long cardId) {
+        return Optional.ofNullable(cardRepository.findById(cardId));
+    }
+
+    public List<Card> findAllByCardSetId(long cardSetId) {
+        return cardRepository.list("cardSet.id", cardSetId);
     }
 }
