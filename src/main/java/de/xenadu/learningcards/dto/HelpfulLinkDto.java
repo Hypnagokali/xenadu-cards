@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HelpfulLinkDto {
+public class HelpfulLinkDto implements AbstractDto {
 
     private long id;
     private String name;

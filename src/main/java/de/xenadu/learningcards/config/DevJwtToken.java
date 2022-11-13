@@ -5,9 +5,13 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import java.util.Set;
 
 public class DevJwtToken implements JsonWebToken {
+
+    private final String testUser = "test@test.de";
+//    private final String testUser = "test@example.org";
+
     @Override
     public String getName() {
-        return "test@example.org";
+        return testUser;
     }
 
     @Override
@@ -18,6 +22,6 @@ public class DevJwtToken implements JsonWebToken {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getClaim(String claimName) {
-        return (T) "test@example.org";
+        return (T) testUser;
     }
 }

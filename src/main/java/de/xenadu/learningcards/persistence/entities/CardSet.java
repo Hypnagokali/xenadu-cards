@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CardSet extends CreatedByAndTimestampAudit {
+public class CardSet extends CreatedByAndTimestampAudit implements AbstractEntity {
 
     private static final String GENERATOR = "card_set_seq";
 

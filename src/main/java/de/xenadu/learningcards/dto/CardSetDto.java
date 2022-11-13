@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CardSetDto {
+public class CardSetDto implements AbstractDto{
 
     private long id;
     private long userId;

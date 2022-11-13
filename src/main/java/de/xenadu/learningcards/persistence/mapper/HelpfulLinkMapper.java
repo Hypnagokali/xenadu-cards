@@ -1,20 +1,20 @@
-package de.xenadu.learningcards.dto;
+package de.xenadu.learningcards.persistence.mapper;
 
+import de.xenadu.learningcards.dto.HelpfulLinkDto;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.HelpfulLink;
 import de.xenadu.learningcards.service.CardService;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 @Mapper(unmappedSourcePolicy = ReportingPolicy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = "cdi"
+        componentModel = "cdi",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        uses = {GenericEntityFactory.class }
 )
 @Slf4j
 public abstract class HelpfulLinkMapper {

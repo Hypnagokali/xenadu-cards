@@ -1,6 +1,7 @@
 package de.xenadu.learningcards.service;
 
 import de.xenadu.learningcards.persistence.entities.Card;
+import de.xenadu.learningcards.persistence.entities.HelpfulLink;
 import de.xenadu.learningcards.persistence.repositories.CardRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -36,14 +37,26 @@ public class CardService {
     @Transactional
     // ToDo: Returned value not needed
     public Card saveCard(Card card) {
+        for (HelpfulLink helpfulLink : card.getHelpfulLinks()) {
+            helpfulLink.setCard(card);
+        }
+
         if (card.getId() > 0) {
             cardRepository.getEntityManager().merge(card);
         } else {
             cardRepository.persist(card);
         }
 
+        // retrieve persistence information (id from helpfulLink)
+        card = cardRepository.findById(card.getId());
+
 
         return card;
+    }
+
+    @Transactional
+    public void deleteCardById(long id) {
+        cardRepository.deleteById(id);
     }
 
     public Card getById(long id) {

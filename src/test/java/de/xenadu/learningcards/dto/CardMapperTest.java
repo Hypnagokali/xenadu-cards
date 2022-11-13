@@ -3,6 +3,11 @@ package de.xenadu.learningcards.dto;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.entities.HelpfulLink;
+import de.xenadu.learningcards.persistence.mapper.CardMapper;
+import de.xenadu.learningcards.persistence.mapper.CardMapperImpl;
+import de.xenadu.learningcards.persistence.mapper.HelpfulLinkMapper;
+import de.xenadu.learningcards.persistence.mapper.HelpfulLinkMapperImpl;
+import de.xenadu.learningcards.persistence.mapper.GenericEntityFactory;
 import de.xenadu.learningcards.persistence.repositories.CardRepository;
 import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
 import de.xenadu.learningcards.service.CardService;
@@ -21,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 public class CardMapperTest {
 
     CardMapper cardMapper;
+    CardService cardService;
     CardSetService cardSetService;
 
     CardSetRepository produceCardSetRepository() {
@@ -48,14 +54,21 @@ public class CardMapperTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        CardService cardService = new CardService(produceCardRepository());
+        cardService = new CardService(produceCardRepository());
         cardSetService = new CardSetService(produceCardSetRepository());
 
         HelpfulLinkMapper helpfulLinkMapper = new HelpfulLinkMapperImpl();
         helpfulLinkMapper.setCardService(cardService);
 
-        cardMapper = new CardMapperImpl(helpfulLinkMapper);
+        cardMapper = new CardMapperImpl(getHelpfulLinkMapper(), produceCardEntityFactory());
         // cardMapper.setCardSetService(cardSetService);
+    }
+
+    private GenericEntityFactory produceCardEntityFactory() {
+        final GenericEntityFactory mock = Mockito.mock(GenericEntityFactory.class);
+        Mockito.when(mock.resolve(any(), Card.class)).thenReturn(new Card());
+
+        return mock;
     }
 
     @Test
@@ -71,11 +84,17 @@ public class CardMapperTest {
         cardDto.setCardSetId(3);
 
         // cardMapper.setCardSetService(cardSetService);
-        final Card card = cardMapper.mapToEntity(cardDto, cardSetService);
+        final Card card = cardMapper.mapToEntity(cardDto, cardSetService, getHelpfulLinkMapper());
 
         assertThat(card.getCardSet()).isNotNull();
         assertThat(card.getCardSet().getName()).isEqualTo("Card Set");
         assertThat(card.getCardSet().getId()).isEqualTo(3);
+    }
+
+    private HelpfulLinkMapper getHelpfulLinkMapper() {
+        HelpfulLinkMapper helpfulLinkMapper = new HelpfulLinkMapperImpl();
+        helpfulLinkMapper.setCardService(cardService);
+        return helpfulLinkMapper;
     }
 
     @Test
@@ -125,7 +144,7 @@ public class CardMapperTest {
         helpfulLinkDto.setId(3);
         cardDto.setHelpfulLinks(Set.of(helpfulLinkDto));
 
-        final Card card = cardMapper.mapToEntity(cardDto, cardSetService);
+        final Card card = cardMapper.mapToEntity(cardDto, cardSetService, getHelpfulLinkMapper());
 
         assertThat(card.getCardSet()).isNotNull();
         assertThat(card.getCardSet().getId()).isEqualTo(1);

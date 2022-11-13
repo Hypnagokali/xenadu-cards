@@ -13,6 +13,8 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+    implementation("io.quarkus:quarkus-smallrye-openapi")
+
     // dependencies
     implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.5.3.Final'
     annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.5.3.Final'

@@ -10,7 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CardDto {
+public class CardDto implements AbstractDto {
 
     private long id;
     private String front = "";

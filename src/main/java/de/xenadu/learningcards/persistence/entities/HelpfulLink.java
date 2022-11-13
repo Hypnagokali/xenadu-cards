@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HelpfulLink {
+public class HelpfulLink implements AbstractEntity {
 
     private static final String GENERATOR = "helpful_link_seq";
 

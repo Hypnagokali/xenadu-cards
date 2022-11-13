@@ -1,15 +1,20 @@
-package de.xenadu.learningcards.dto;
+package de.xenadu.learningcards.persistence.mapper;
 
+import de.xenadu.learningcards.dto.CardSetDto;
 import de.xenadu.learningcards.persistence.entities.CardSet;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = "cdi",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        uses = {GenericEntityFactory.class }
+)
 public interface CardSetMapper {
 
     CardSetDto mapToDto(CardSet cardSet);
+
+    @Mapping(target = "id", ignore = true)
     CardSet mapToEntity(CardSetDto cardSetDto);
 
     @AfterMapping

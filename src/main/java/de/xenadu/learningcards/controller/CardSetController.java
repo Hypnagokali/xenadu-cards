@@ -2,9 +2,12 @@ package de.xenadu.learningcards.controller;
 
 import de.xenadu.learningcards.domain.UserInfo;
 import de.xenadu.learningcards.dto.CardSetDto;
-import de.xenadu.learningcards.dto.CardSetMapper;
+import de.xenadu.learningcards.exceptions.RestBadRequestException;
+import de.xenadu.learningcards.persistence.entities.Card;
+import de.xenadu.learningcards.persistence.mapper.CardSetMapper;
 import de.xenadu.learningcards.exceptions.RestForbiddenException;
 import de.xenadu.learningcards.persistence.entities.CardSet;
+import de.xenadu.learningcards.persistence.mapper.GenericEntityFactory;
 import de.xenadu.learningcards.service.CardSetService;
 import de.xenadu.learningcards.service.GetUserInfo;
 import io.quarkus.security.Authenticated;
@@ -25,8 +28,8 @@ public class CardSetController {
 
     private final CardSetService cardSetService;
     private final GetUserInfo getUserInfo;
-
-    private CardSetMapper cardSetMapper = Mappers.getMapper(CardSetMapper.class);
+    private final GenericEntityFactory genericEntityFactory;
+    private final CardSetMapper cardSetMapper;
 
     @POST
     @Path("")
@@ -73,8 +76,11 @@ public class CardSetController {
     @Consumes(MediaType.APPLICATION_JSON)
     public CardSetDto updateCardSet(CardSetDto cardSetDto, @PathParam("cardSetId") long cardSetId) {
         final CardSet cardSet = cardSetMapper.mapToEntity(cardSetDto);
+        if (cardSet.getId() == 0) {
+            throw new RestBadRequestException(String.format("There is no CardSet with ID = %d", cardSetDto.getId()));
+        }
         if (cardSetId != cardSet.getId()) {
-            throw new BadRequestException("ID is not equal");
+            throw new RestBadRequestException("ID is not equal");
         }
 
         return cardSetMapper.mapToDto(

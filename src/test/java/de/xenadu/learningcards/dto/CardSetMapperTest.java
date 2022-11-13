@@ -2,6 +2,7 @@ package de.xenadu.learningcards.dto;
 
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
+import de.xenadu.learningcards.persistence.mapper.CardSetMapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
