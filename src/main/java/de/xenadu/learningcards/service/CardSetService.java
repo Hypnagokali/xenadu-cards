@@ -4,7 +4,6 @@ import de.xenadu.learningcards.domain.UserInfo;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,7 +25,7 @@ public class CardSetService {
     }
 
     public CardSet save(CardSet cardSet, UserInfo userInfo) {
-        if (cardSet.getUserId() > 0 && userInfo.getId() != cardSet.getUserId()) {
+        if (cardSet.getUserId() == 0 || userInfo.getId() != cardSet.getUserId()) {
             throw new ForbiddenException();
         }
 

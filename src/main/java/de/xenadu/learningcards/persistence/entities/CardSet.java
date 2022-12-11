@@ -29,7 +29,7 @@ public class CardSet extends CreatedByAndTimestampAudit implements AbstractEntit
 
     @OneToMany(
             mappedBy = "cardSet",
-            cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},
+            cascade = CascadeType.ALL, // { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},
             orphanRemoval = true
     )
     private Set<Card> cards = new LinkedHashSet<>();

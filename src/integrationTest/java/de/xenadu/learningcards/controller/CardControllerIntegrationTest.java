@@ -13,6 +13,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 
@@ -32,8 +33,18 @@ class CardControllerIntegrationTest {
             return null;
         }
 
-        @Override
+
         public Instant expiresIn() {
+            return null;
+        }
+
+        @Override
+        public Instant expiresAt() {
+            return null;
+        }
+
+        @Override
+        public Duration validFor() {
             return null;
         }
 

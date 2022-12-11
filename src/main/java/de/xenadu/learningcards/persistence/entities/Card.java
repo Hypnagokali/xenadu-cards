@@ -59,6 +59,13 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
         this.back = back;
     }
 
+    public Card(String front, String back, int repState, LocalDateTime lastLearned) {
+        this.repetitionState = repState;
+        this.front = front;
+        this.back = back;
+        this.lastLearned = lastLearned;
+    }
+
     public void addLink(HelpfulLink helpfulLink) {
         helpfulLink.setCard(this);
         this.helpfulLinks.add(helpfulLink);

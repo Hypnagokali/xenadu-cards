@@ -1,11 +1,40 @@
 plugins {
     id 'java'
     id 'io.quarkus'
+    id 'checkstyle'
 }
 
 repositories {
     mavenCentral()
     mavenLocal()
+}
+
+checkstyle {
+    toolVersion = '10.5.0'
+    ignoreFailures = true
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += sourceSets.main.output + sourceSets.test.output
+            runtimeClasspath += sourceSets.main.output + sourceSets.test.output
+            srcDir file('src/integrationTest/java')
+        }
+        resources.srcDir file('src/integrationTest/resources')
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+
+}
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
 dependencies {

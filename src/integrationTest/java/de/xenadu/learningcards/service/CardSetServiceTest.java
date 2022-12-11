@@ -2,14 +2,10 @@ package de.xenadu.learningcards.service;
 
 import de.xenadu.learningcards.domain.UserInfo;
 import de.xenadu.learningcards.persistence.entities.CardSet;
-import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.inject.Inject;
-
 import java.util.Optional;
 import java.util.Set;
 

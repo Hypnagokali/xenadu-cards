@@ -2,11 +2,11 @@ package de.xenadu.learningcards.controller;
 
 import de.xenadu.learningcards.domain.UserInfo;
 import de.xenadu.learningcards.dto.CardDto;
+import de.xenadu.learningcards.exceptions.RestBadRequestException;
 import de.xenadu.learningcards.exceptions.RestForbiddenException;
+import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.mapper.CardMapper;
-import de.xenadu.learningcards.exceptions.RestBadRequestException;
-import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.mapper.HelpfulLinkMapper;
 import de.xenadu.learningcards.service.CardService;
 import de.xenadu.learningcards.service.CardSetService;
@@ -87,6 +87,19 @@ public class CardController {
             throw new RestForbiddenException();
         }
 
+    }
+
+    @GET
+    @Path("/{cardId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public CardDto fetchCard(@PathParam("cardId") long cardId) {
+        final UserInfo userInfo = getUserInfo.authenticatedUser();
+        final Card card = cardService.findById(cardId).orElseThrow(() -> new RestBadRequestException("No Card with this id"));
+        if (card.getCardSet().getUserId() == userInfo.getId()) {
+            return cardMapper.mapToDto(card);
+        } else {
+            throw new RestForbiddenException();
+        }
     }
 
     @GET
