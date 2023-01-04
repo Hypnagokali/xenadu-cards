@@ -36,6 +36,10 @@ public class LearnSessionManager implements Serializable {
         final int numberOfNewCards = learnSessionConfig.getNumberOfNewCards();
 
         final List<Card> newCards = cardService.findNewCards(cardSetId, numberOfNewCards);
+        if (newCards.size() < numberOfNewCards) {
+            int diff = numberOfNewCards - newCards.size();
+            learnSessionConfig.setNumberOfCardsForRepetition(learnSessionConfig.getNumberOfCardsForRepetition() + diff);
+        }
         final Map<Integer, Queue<Card>> cardsToRepeat = cardDistributor.distribute(
                 learnSessionConfig
         );
