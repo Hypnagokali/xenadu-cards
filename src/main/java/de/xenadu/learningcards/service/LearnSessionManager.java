@@ -8,11 +8,9 @@ import lombok.RequiredArgsConstructor;
 
 import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 @SessionScoped
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class LearnSessionManager implements Serializable {
         Queue<Card> setOfCards = generateLearningSet(learnSessionConfig);
         final LearnSession learnSession = new LearnSession(learnSessionConfig, setOfCards);
 
-        init(learnSession);
+//        init(learnSession);
 
         learnSessionMap.put(learnSession.getLearnSessionId().getValue(), learnSession);
 
@@ -42,16 +40,18 @@ public class LearnSessionManager implements Serializable {
                 learnSessionConfig
         );
 
+        Queue<Card> allCards = new LinkedList<>(newCards);
 
-        return null;
+        cardsToRepeat.keySet().stream().sorted().forEach(repState ->
+            allCards.addAll(cardsToRepeat.get(repState))
+        );
+
+        return allCards;
     }
 
     public Optional<LearnSession> getLearnSession(LearnSessionId learnSessionId) {
         return Optional.ofNullable(learnSessionMap.get(learnSessionId.getValue()));
     }
 
-    private void init(LearnSession learnSession) {
-        List<Card> newCards = cardService.findNewCards(1, learnSession.getConfig().getNumberOfNewCards());
 
-    }
 }

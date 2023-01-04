@@ -6,7 +6,7 @@ import org.jboss.resteasy.reactive.client.spi.ResteasyReactiveClientRequestFilte
 
 import javax.ws.rs.ext.Provider;
 
-@Provider
+//@Provider
 public class CustomLoggingFilter implements ResteasyReactiveClientRequestFilter {
 
     private static final Logger logger = Logger.getLogger(CustomLoggingFilter.class);
@@ -15,6 +15,5 @@ public class CustomLoggingFilter implements ResteasyReactiveClientRequestFilter 
     public void filter(ResteasyReactiveClientRequestContext requestContext) {
         logger.info("------------Outgoing Request----------------");
         logger.infof(requestContext.getUri().toString());
-
     }
 }

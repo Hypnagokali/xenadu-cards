@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserInfo getUserByEmail(String email) {
-        final ServiceInfo serviceInfo = serviceLookup.getInfoOf("user-service");
+        final ServiceInfo serviceInfo = serviceLookup.getInfoOf("user_service");
 
         WebClientOptions options = new WebClientOptions();
         options.setLogActivity(true);

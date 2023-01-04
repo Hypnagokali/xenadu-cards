@@ -12,7 +12,7 @@ public interface CardDistributor {
      * Takes a number, how many cards the user wants to learn and distribute them
      * to the repetition states
      *
-     * @param numberOfCardsForDistribution number of cards to distribute
+     * @param config number of cards to distribute
      * @return Map with key as repetitionState and the cards which belong to that repState as Queue
      */
     Map<Integer, Queue<Card>> distribute(LearnSessionConfig config);

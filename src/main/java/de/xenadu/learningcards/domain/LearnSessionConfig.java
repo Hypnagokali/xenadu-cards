@@ -12,8 +12,8 @@ public class LearnSessionConfig {
     private long userId;
     private boolean spellChecking;
     private boolean onlyRepetition;
-    private int numberOfNewCards;
-    private int numberOfCardsForRepetition;
+    private int numberOfNewCards = 2;
+    private int numberOfCardsForRepetition = 7;
     private boolean recentlyLearnedFirst = true;
 
 
