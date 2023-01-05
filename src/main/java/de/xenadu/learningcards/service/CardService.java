@@ -11,10 +11,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @ApplicationScoped
 @NoArgsConstructor
@@ -151,5 +148,12 @@ public class CardService {
                         "ORDER BY lastLearned ASC", 0, cardSetId);
 
         return cardPanacheQuery.range(0, numberOfNewCards - 1).list();
+    }
+
+    @Transactional
+    public void saveAll(Collection<Card> cards) {
+        for (Card card : cards) {
+            cardRepository.getEntityManager().merge(card);
+        }
     }
 }

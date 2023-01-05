@@ -26,6 +26,8 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     private String back = "";
     private boolean noun;
 
+    private boolean lastResultWasCorrect;
+
     @Column(columnDefinition = "CHARACTER VARYING (12) DEFAULT 'n'")
     private String gender = "n";
 

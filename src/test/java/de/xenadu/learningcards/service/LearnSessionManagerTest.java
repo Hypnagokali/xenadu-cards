@@ -13,6 +13,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@SuppressWarnings("ALL")
 class LearnSessionManagerTest {
 
     LearnSessionManager learnSessionManager;
@@ -21,7 +22,7 @@ class LearnSessionManagerTest {
     @BeforeEach
     public void setUp() throws Exception {
         cardService = Mockito.mock(CardService.class);
-        learnSessionManager = new LearnSessionManager(cardService, new SimpleCardDistributor(cardService));
+        learnSessionManager = new LearnSessionManager(cardService, new SimpleCardDistributor(cardService), new WordByWordAnswerAuditor());
     }
 
     @Test
@@ -52,9 +53,9 @@ class LearnSessionManagerTest {
         final LearnSession learnSession = learnSessionManager
                 .startNewLearnSession(learnSessionConfig);
 
-        Card cardNew1 = learnSession.getNextCard();
-        Card cardNew2 = learnSession.getNextCard();
-        Card cardOld = learnSession.getNextCard();
+        Card cardNew1 = learnSession.getNextCard().getCurrentCard().get();
+        Card cardNew2 = learnSession.getNextCard().getCurrentCard().get();
+        Card cardOld = learnSession.getNextCard().getCurrentCard().get();
 
     }
 

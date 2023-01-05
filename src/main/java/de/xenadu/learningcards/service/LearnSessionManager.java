@@ -1,8 +1,6 @@
 package de.xenadu.learningcards.service;
 
-import de.xenadu.learningcards.domain.LearnSession;
-import de.xenadu.learningcards.domain.LearnSessionConfig;
-import de.xenadu.learningcards.domain.LearnSessionId;
+import de.xenadu.learningcards.domain.*;
 import de.xenadu.learningcards.persistence.entities.Card;
 import lombok.RequiredArgsConstructor;
 
@@ -10,19 +8,20 @@ import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 @SessionScoped
 @RequiredArgsConstructor
-public class LearnSessionManager implements Serializable {
+public class LearnSessionManager implements Serializable, CardPersister {
 
     private final CardService cardService;
+
     private final Map<String, LearnSession> learnSessionMap = new ConcurrentHashMap<>();
     private final CardDistributor cardDistributor;
+    private final AnswerAuditor answerAuditor;
 
     public LearnSession startNewLearnSession(LearnSessionConfig learnSessionConfig) {
         Queue<Card> setOfCards = generateLearningSet(learnSessionConfig);
-        final LearnSession learnSession = new LearnSession(learnSessionConfig, setOfCards);
+        final LearnSession learnSession = new LearnSession(learnSessionConfig, setOfCards, answerAuditor);
 
 //        init(learnSession);
 
@@ -58,4 +57,13 @@ public class LearnSessionManager implements Serializable {
     }
 
 
+    @Override
+    public void save(Card card) {
+        cardService.saveCard(card);
+    }
+
+    @Override
+    public void saveAll(Collection<Card> cards) {
+        cardService.saveAll(cards);
+    }
 }
