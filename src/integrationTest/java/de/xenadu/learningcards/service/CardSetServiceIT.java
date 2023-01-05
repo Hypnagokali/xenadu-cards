@@ -12,7 +12,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @QuarkusTest
-public class CardSetServiceTest {
+public class CardSetServiceIT {
 
     @Inject
     CardSetService cardSetService;

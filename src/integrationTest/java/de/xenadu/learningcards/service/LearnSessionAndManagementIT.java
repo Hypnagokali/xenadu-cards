@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("ALL")
 @QuarkusTest
-public class LearnSessionAndManagementTest {
+public class LearnSessionAndManagementIT {
 
     @Inject
     CardSetService cardSetService;
@@ -72,8 +72,11 @@ public class LearnSessionAndManagementTest {
     }
 
     @Test
-    void whenFinishingALearnSession_ExpectAllCardsAreSaved() {
-        assertThat(true).isFalse();
+    void whenFinishingALearnSession_ExpectSessionWillRemovedFromSessionManager() {
+        LearnSession learnSession = learnSessionManager.startNewLearnSession(learnSessionWithAllNewCards(cardSetId));
+        learnSession.finish();
+
+        assertThat(learnSessionManager.getLearnSession(learnSession.getLearnSessionId())).isEmpty();
     }
 
     @Test
@@ -81,14 +84,14 @@ public class LearnSessionAndManagementTest {
         LearnSession learnSession = learnSessionManager.startNewLearnSession(learnSessionWithAllNewCards(cardSetId));
         Optional<Card> new1Card = learnSession.getLearningCards().stream().filter(c -> c.getFront().equals("new 1")).findAny();
 
-        AnswerResult r = learnSession.checkAnswer("wrong answer", new1Card.get());
+        AnswerResult r = learnSession.checkAnswer("neu 1", new1Card.get());
 
-        assertThat(r.isCorrect()).isFalse();
+        assertThat(r.isCorrect()).isTrue();
         Optional<Card> loadedCard = cardService.findById(new1Card.get().getId());
 
         assertThat(loadedCard).isNotEmpty();
-        assertThat(loadedCard.get().getRepetitionState()).isEqualTo(0);
-        assertThat(loadedCard.get().isLastResultWasCorrect()).isFalse();
+        assertThat(loadedCard.get().getRepetitionState()).isEqualTo(1);
+        assertThat(loadedCard.get().isLastResultWasCorrect()).isTrue();
 
     }
 

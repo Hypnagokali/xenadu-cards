@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SessionScoped
 @RequiredArgsConstructor
-public class LearnSessionManager implements Serializable, CardPersister {
+public class LearnSessionManager implements Serializable, LearnSessionEventCallback {
 
     private final CardService cardService;
 
@@ -21,9 +21,9 @@ public class LearnSessionManager implements Serializable, CardPersister {
 
     public LearnSession startNewLearnSession(LearnSessionConfig learnSessionConfig) {
         Queue<Card> setOfCards = generateLearningSet(learnSessionConfig);
-        final LearnSession learnSession = new LearnSession(learnSessionConfig, setOfCards, answerAuditor);
 
-//        init(learnSession);
+        // is it really a good idea to use the LearnSessionManager as a callback? (05.01.23, StS)
+        final LearnSession learnSession = new LearnSession(learnSessionConfig, setOfCards, answerAuditor, this);
 
         learnSessionMap.put(learnSession.getLearnSessionId().getValue(), learnSession);
 
@@ -65,5 +65,10 @@ public class LearnSessionManager implements Serializable, CardPersister {
     @Override
     public void saveAll(Collection<Card> cards) {
         cardService.saveAll(cards);
+    }
+
+    @Override
+    public void finish(LearnSession learnSession) {
+        learnSessionMap.remove(learnSession.getLearnSessionId().getValue());
     }
 }

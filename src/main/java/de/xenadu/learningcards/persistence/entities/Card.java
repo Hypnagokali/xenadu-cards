@@ -26,7 +26,9 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     private String back = "";
     private boolean noun;
 
-    private boolean lastResultWasCorrect;
+
+    @Column(columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean lastResultWasCorrect = false;
 
     @Column(columnDefinition = "CHARACTER VARYING (12) DEFAULT 'n'")
     private String gender = "n";
@@ -71,5 +73,15 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     public void addLink(HelpfulLink helpfulLink) {
         helpfulLink.setCard(this);
         this.helpfulLinks.add(helpfulLink);
+    }
+
+    public void nextRepState() {
+        // for now, it is okay, when the card gets to an undefined repState.
+        repetitionState++;
+    }
+
+    public void prevRepState() {
+        if (repetitionState > 1) repetitionState--;
+        // repState 0 is only for new cards. A card, that was already learned has the minimum state of 1
     }
 }

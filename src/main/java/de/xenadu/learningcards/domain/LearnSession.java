@@ -15,16 +15,23 @@ public class LearnSession {
     private final LearnSessionConfig config;
     private final AnswerAuditor answerAuditor;
 
+    private final LearnSessionEventCallback learnSessionEventCallback;
+
     private final Queue<Card> learningCards;
 
 
     private Card currentCard = null;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
-    public LearnSession(LearnSessionConfig learnSessionConfig, Queue<Card> learningCards, AnswerAuditor answerAuditor) {
+    public LearnSession(LearnSessionConfig learnSessionConfig,
+                        Queue<Card> learningCards,
+                        AnswerAuditor answerAuditor,
+                        LearnSessionEventCallback learnSessionEventCallback
+    ) {
         learnSessionId = new LearnSessionId(UUID.randomUUID().toString());
         this.learningCards = learningCards;
         this.answerAuditor = answerAuditor;
+        this.learnSessionEventCallback = learnSessionEventCallback;
         config = learnSessionConfig;
         config.setLearnSessionId(learnSessionId);
     }
@@ -45,7 +52,22 @@ public class LearnSession {
 
     public AnswerResult checkAnswer(String answer, Card card) {
         AnswerResult r = answerAuditor.checkResult(answer, card);
-        // ToDo: manipulate card an save
+        if (r.isCorrect()) {
+            card.nextRepState();
+            card.setLastResultWasCorrect(true);
+        } else {
+            card.prevRepState();
+            card.setLastResultWasCorrect(false);
+        }
+
+        learnSessionEventCallback.save(card);
+
         return r;
+    }
+
+    public void finish() {
+        // cards should already be saved.
+        // Todo: generate or publish statistics?
+        learnSessionEventCallback.finish(this);
     }
 }

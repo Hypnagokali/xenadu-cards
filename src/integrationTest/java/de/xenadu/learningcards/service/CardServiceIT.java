@@ -15,7 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @QuarkusTest
-public class CardServiceTest {
+public class CardServiceIT {
 
     @Inject
     CardService cardService;
