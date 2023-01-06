@@ -4,12 +4,15 @@ import de.xenadu.learningcards.domain.*;
 import de.xenadu.learningcards.persistence.entities.Card;
 import lombok.RequiredArgsConstructor;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SessionScoped
+@ApplicationScoped
 @RequiredArgsConstructor
 public class LearnSessionManager implements Serializable, LearnSessionEventCallback {
 
@@ -18,6 +21,12 @@ public class LearnSessionManager implements Serializable, LearnSessionEventCallb
     private final Map<String, LearnSession> learnSessionMap = new ConcurrentHashMap<>();
     private final CardDistributor cardDistributor;
     private final AnswerAuditor answerAuditor;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("ToDo: Start a thread that destroys old learn sessions");
+    }
+
 
     public LearnSession startNewLearnSession(LearnSessionConfig learnSessionConfig) {
         Queue<Card> setOfCards = generateLearningSet(learnSessionConfig);

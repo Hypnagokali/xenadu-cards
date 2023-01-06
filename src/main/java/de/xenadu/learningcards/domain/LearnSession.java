@@ -22,6 +22,7 @@ public class LearnSession {
 
     private Card currentCard = null;
     private int totalNumberOfCards;
+    private int numberOfCardsPassed;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     public LearnSession(LearnSessionConfig learnSessionConfig,
@@ -36,6 +37,7 @@ public class LearnSession {
         config = learnSessionConfig;
         config.setLearnSessionId(learnSessionId);
         this.totalNumberOfCards = learningCards.size();
+        this.numberOfCardsPassed = 0;
     }
 
     public Optional<Card> getCurrentCard() {
@@ -62,7 +64,11 @@ public class LearnSession {
             card.setLastResultWasCorrect(false);
         }
 
+        numberOfCardsPassed++;
+
         learnSessionEventCallback.save(card);
+
+        getNextCard();
 
         return r;
     }
@@ -78,6 +84,6 @@ public class LearnSession {
     }
 
     public int getNumberOfCardsPassed() {
-        return totalNumberOfCards - learningCards.size();
+        return numberOfCardsPassed;
     }
 }

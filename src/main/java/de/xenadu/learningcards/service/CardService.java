@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -85,10 +86,11 @@ public class CardService {
         LocalDateTime readyForRepetition = hardCodedMapping(repState);
 
         final PanacheQuery<Card> query = cardRepository.find(
-                "repetitionState = ?1 " +
-                        "AND cardSet.id = ?2 " +
-                        "AND lastLearned <= ?3 " +
-                        "ORDER BY lastLearned " + orderDirection,
+                "SELECT c FROM Card c " +
+                        "WHERE c.repetitionState = ?1 " +
+                        "AND c.cardSet.id = ?2 " +
+                        "AND c.lastLearned <= ?3 " +
+                        "ORDER BY c.lastLearned " + orderDirection,
                 repState,
                 cardSetId,
                 readyForRepetition);
@@ -97,7 +99,7 @@ public class CardService {
             return query.range(0, limit - 1).list();
         }
 
-        return query.list();
+        return fetchHelpfulLinks(query.list().stream().map(Card::getId).toList());
     }
 
     public List<Card> findCardsThatAreReadyForRepetitionByRepState(
@@ -108,6 +110,7 @@ public class CardService {
     }
 
     private LocalDateTime hardCodedMapping(int repState) {
+        // ToDo: Hardcoded
         final LocalDateTime now = LocalDateTime.now();
         switch (repState) {
             case 0:
@@ -143,11 +146,26 @@ public class CardService {
 
     public List<Card> findNewCards(long cardSetId, int numberOfNewCards) {
         final PanacheQuery<Card> cardPanacheQuery = cardRepository.find(
-                "repetitionState = ?1 " +
-                        "AND cardSet.id = ?2 " +
-                        "ORDER BY lastLearned ASC", 0, cardSetId);
+                "SELECT c FROM Card c " +
+                        "WHERE c.repetitionState = ?1 " +
+                        "AND c.cardSet.id = ?2 " +
+                        "ORDER BY c.lastLearned ASC", 0, cardSetId);
 
-        return cardPanacheQuery.range(0, numberOfNewCards - 1).list();
+        List<Long> cardIds = cardPanacheQuery.range(0, numberOfNewCards - 1).list()
+                .stream().map(Card::getId).toList();
+
+        return fetchHelpfulLinks(cardIds);
+    }
+
+    private List<Card> fetchHelpfulLinks(List<Long> cardIds) {
+        EntityManager em = cardRepository.getEntityManager();
+        return em.createQuery("""
+                        SELECT DISTINCT c FROM Card c
+                        LEFT JOIN FETCH c.helpfulLinks
+                        WHERE c.id IN (?1)
+                        """, Card.class)
+                .setParameter(1, cardIds)
+                .getResultList();
     }
 
     @Transactional
