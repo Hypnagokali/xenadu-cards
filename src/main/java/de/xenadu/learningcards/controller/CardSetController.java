@@ -14,6 +14,7 @@ import io.quarkus.security.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -30,6 +31,11 @@ public class CardSetController {
     private final GetUserInfo getUserInfo;
     private final GenericEntityFactory genericEntityFactory;
     private final CardSetMapper cardSetMapper;
+
+    @PostConstruct
+    public void init () {
+        cardSetMapper.setCardSetService(cardSetService);
+    }
 
     @POST
     @Path("")

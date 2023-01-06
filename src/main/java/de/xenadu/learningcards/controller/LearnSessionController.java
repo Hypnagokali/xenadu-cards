@@ -30,7 +30,7 @@ public class LearnSessionController {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Map<String, String> letMeStartLearning(@PathParam("cardSetId") long cardSetId, @RequestBody StartLearnSessionRequest request) {
+    public Map<String, Object> letMeStartLearning(@PathParam("cardSetId") long cardSetId, @RequestBody StartLearnSessionRequest request) {
         UserInfo userInfo = getUserInfo.authenticatedUser();
 
         CardSet cardSet = cardSetService.findById(cardSetId).orElseThrow(() -> new RestBadRequestException("No Card Set found"));
@@ -50,6 +50,9 @@ public class LearnSessionController {
 
         return new HashMap<>() {{
             put("sessionId", learnSession.getLearnSessionId().getValue());
+            put("spellChecking", config.isSpellChecking());
+            put("totalNumberOfCards", learnSession.getTotalNumberOfCards());
+            put("numberOfCardsPassed", learnSession.getNumberOfCardsPassed());
         }};
     }
 

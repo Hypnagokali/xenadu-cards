@@ -48,4 +48,11 @@ public class CardSet extends CreatedByAndTimestampAudit implements AbstractEntit
         card.setCardSet(this);
         this.cards.add(card);
     }
+
+    public void addAll(Set<Card> cardSet) {
+        for (Card card : cardSet) {
+            card.setCardSet(this);
+            this.cards.add(card);
+        }
+    }
 }

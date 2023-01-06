@@ -52,7 +52,7 @@ public class CardMapperIT {
     @BeforeEach
     public void setUp() throws Exception {
         cardService = new CardService(produceCardRepository());
-        cardSetService = new CardSetService(produceCardSetRepository());
+        cardSetService = new CardSetService(produceCardSetRepository(), null);
 
         HelpfulLinkMapper helpfulLinkMapper = new HelpfulLinkMapperImpl();
         helpfulLinkMapper.setCardService(cardService);

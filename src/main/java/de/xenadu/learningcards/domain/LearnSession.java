@@ -21,6 +21,7 @@ public class LearnSession {
 
 
     private Card currentCard = null;
+    private int totalNumberOfCards;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     public LearnSession(LearnSessionConfig learnSessionConfig,
@@ -34,6 +35,7 @@ public class LearnSession {
         this.learnSessionEventCallback = learnSessionEventCallback;
         config = learnSessionConfig;
         config.setLearnSessionId(learnSessionId);
+        this.totalNumberOfCards = learningCards.size();
     }
 
     public Optional<Card> getCurrentCard() {
@@ -69,5 +71,13 @@ public class LearnSession {
         // cards should already be saved.
         // Todo: generate or publish statistics?
         learnSessionEventCallback.finish(this);
+    }
+
+    public int getTotalNumberOfCards() {
+        return totalNumberOfCards;
+    }
+
+    public int getNumberOfCardsPassed() {
+        return totalNumberOfCards - learningCards.size();
     }
 }

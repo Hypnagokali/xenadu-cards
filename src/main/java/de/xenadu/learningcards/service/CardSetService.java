@@ -1,12 +1,16 @@
 package de.xenadu.learningcards.service;
 
+import de.xenadu.learningcards.domain.CardSetInfos;
 import de.xenadu.learningcards.domain.UserInfo;
+import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
+import de.xenadu.learningcards.persistence.repositories.CardRepository;
 import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
 import lombok.NoArgsConstructor;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
@@ -18,10 +22,21 @@ import java.util.*;
 public class CardSetService {
 
     private CardSetRepository cardSetRepository;
+    private CardRepository cardRepository;
 
     @Inject
-    public CardSetService(CardSetRepository cardSetRepository) {
+    public CardSetService(CardSetRepository cardSetRepository, CardRepository cardRepository) {
         this.cardSetRepository = cardSetRepository;
+        this.cardRepository = cardRepository;
+    }
+
+
+    @Transactional
+    public CardSetInfos getCardSetInfos(long cardSetId) {
+        int numberOfNewCards = (int) cardRepository.find("cardSet.id = ?1 AND repetitionState = 0", cardSetId).count();
+        int numberOfCardsForRep = (int) cardRepository.find("cardSet.id = ?1 AND repetitionState > 0", cardSetId).count();
+
+        return new CardSetInfos(numberOfNewCards, numberOfCardsForRep, 0, 0);
     }
 
     public CardSet save(CardSet cardSet, UserInfo userInfo) {

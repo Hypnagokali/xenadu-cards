@@ -1,7 +1,11 @@
 package de.xenadu.learningcards.persistence.mapper;
 
+import de.xenadu.learningcards.domain.CardSetInfos;
 import de.xenadu.learningcards.dto.CardSetDto;
+import de.xenadu.learningcards.exceptions.MissingMappingConfigurationException;
 import de.xenadu.learningcards.persistence.entities.CardSet;
+import de.xenadu.learningcards.service.CardSetService;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.*;
 
 @Mapper(
@@ -10,15 +14,28 @@ import org.mapstruct.*;
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
         uses = {GenericEntityFactory.class }
 )
-public interface CardSetMapper {
+@Slf4j
+public abstract class CardSetMapper {
 
-    CardSetDto mapToDto(CardSet cardSet);
+    private CardSetService cardSetService;
+
+    public void setCardSetService(CardSetService cardSetService) {
+        this.cardSetService = cardSetService;
+    }
+
+    public abstract CardSetDto mapToDto(CardSet cardSet);
 
     @Mapping(target = "id", ignore = true)
-    CardSet mapToEntity(CardSetDto cardSetDto);
+    public abstract CardSet mapToEntity(CardSetDto cardSetDto);
 
     @AfterMapping
-    default void calculateNumberOfCards(CardSet cardSet, @MappingTarget CardSetDto cardSetDto) {
+    void calculateNumberOfCards(CardSet cardSet, @MappingTarget CardSetDto cardSetDto) {
+        if (cardSetService == null) {
+            log.warn("cardSetService is not set. Some values cannot be mapped");
+            cardSetDto.setCardSetInfos(new CardSetInfos(0, 0, 0, 0));
+        } else {
+            cardSetDto.setCardSetInfos(cardSetService.getCardSetInfos(cardSetDto.getId()));
+        }
         cardSetDto.setNumberOfCards(cardSet.getCards().size());
     }
 }

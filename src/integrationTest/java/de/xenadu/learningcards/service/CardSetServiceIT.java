@@ -1,8 +1,11 @@
 package de.xenadu.learningcards.service;
 
+import de.xenadu.learningcards.domain.CardSetInfos;
 import de.xenadu.learningcards.domain.UserInfo;
+import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -16,6 +19,21 @@ public class CardSetServiceIT {
 
     @Inject
     CardSetService cardSetService;
+    private CardSet testCardSet;
+
+    @BeforeEach
+    void setUp() {
+        testCardSet = new CardSet();
+        testCardSet.setName("test");
+        testCardSet.setUser(testUser());
+
+        Card card = new Card("new", "neu", 0);
+        Card cardOld = new Card("old 1", "alt 1", 1);
+        Card cardOld2 = new Card("old 2", "alt 2", 6);
+        testCardSet.addAll(Set.of(card, cardOld, cardOld2));
+
+        cardSetService.save(testCardSet, testUser());
+    }
 
     private static UserInfo testUser() {
         final UserInfo userInfo = new UserInfo();
@@ -23,6 +41,14 @@ public class CardSetServiceIT {
         userInfo.setId(123);
 
         return userInfo;
+    }
+
+    @Test
+    void loadCardSetInfos_ExpectCorrectReflectionOfTheData() {
+        CardSetInfos cardSetInfos = cardSetService.getCardSetInfos(testCardSet.getId());
+
+        assertThat(cardSetInfos.totalNumberOfNewCards()).isEqualTo(1);
+        assertThat(cardSetInfos.totalNumberOfCardsForRepetition()).isEqualTo(2);
     }
 
     @Test
