@@ -5,5 +5,5 @@ import de.xenadu.learningcards.persistence.entities.Card;
 public interface AnswerAuditor {
 
 
-    AnswerResult checkResult(String answer, Card card);
+    AnswerResult checkResult(AnswerRequest request, Card card);
 }

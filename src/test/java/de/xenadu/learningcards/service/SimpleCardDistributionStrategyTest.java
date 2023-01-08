@@ -13,9 +13,9 @@ import java.util.Queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SimpleCardDistributorTest {
+class SimpleCardDistributionStrategyTest {
 
-    CardDistributor cardDistributor;
+    CardDistributionStrategy cardDistributionStrategy;
     LearnSessionConfig config;
     CardService cardService;
 
@@ -23,7 +23,7 @@ class SimpleCardDistributorTest {
     public void setUp() throws Exception {
         cardService = Mockito.mock(CardService.class);
         config = new LearnSessionConfig(1);
-        cardDistributor = new SimpleCardDistributor(cardService);
+        cardDistributionStrategy = new SimpleCardDistributionStrategy(cardService);
     }
 
     @Test
@@ -35,7 +35,7 @@ class SimpleCardDistributorTest {
         prepareMocks();
 
         // And we want 4 cards to be distributed
-        final Map<Integer, Queue<Card>> distribute = cardDistributor.distribute(config);
+        final Map<Integer, Queue<Card>> distribute = cardDistributionStrategy.distribute(config);
 
         // Expect 2 Cards in repState 3 and 1 Card in repState 1 and 2
         final Queue<Card> cardsIn1 = distribute.get(1);

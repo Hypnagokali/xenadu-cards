@@ -14,7 +14,7 @@ class AnswerAuditorTest {
         Card card = new Card("Meine Mutter trink saft", "Моя мама пьёт сок");
         String myAnswer = "  Моя    Мама пьёт сок   ";
 
-        AnswerResult answerResult = auditor.checkResult(myAnswer, card);
+        AnswerResult answerResult = auditor.checkResult(new AnswerRequest(myAnswer, true), card);
 
         assertThat(answerResult.isCorrect()).isTrue();
     }
@@ -25,7 +25,7 @@ class AnswerAuditorTest {
         Card card = new Card("Meine Mutter trink saft", "Моя мама пьёт сок");
         String myAnswer = "Моя Мама пёт сок";
 
-        AnswerResult answerResult = auditor.checkResult(myAnswer, card);
+        AnswerResult answerResult = auditor.checkResult(new AnswerRequest(myAnswer, true), card);
 
         assertThat(answerResult.isCorrect()).isFalse();
     }

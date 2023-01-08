@@ -6,7 +6,7 @@ import de.xenadu.learningcards.persistence.entities.Card;
 import java.util.Map;
 import java.util.Queue;
 
-public interface CardDistributor {
+public interface CardDistributionStrategy {
 
     /**
      * Takes a number, how many cards the user wants to learn and distribute them

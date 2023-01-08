@@ -3,9 +3,8 @@ package de.xenadu.learningcards.domain;
 import de.xenadu.learningcards.persistence.entities.Card;
 import lombok.Getter;
 
-import java.util.Optional;
-import java.util.Queue;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Getter
@@ -18,11 +17,11 @@ public class LearnSession {
     private final LearnSessionEventCallback learnSessionEventCallback;
 
     private final Queue<Card> learningCards;
+    private final Set<Card> correctlyAnsweredCards = new HashSet<>();
+    private final Set<Card> wronglyAnsweredCards = new HashSet<>();
 
 
     private Card currentCard = null;
-    private int totalNumberOfCards;
-    private int numberOfCardsPassed;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     public LearnSession(LearnSessionConfig learnSessionConfig,
@@ -36,8 +35,6 @@ public class LearnSession {
         this.learnSessionEventCallback = learnSessionEventCallback;
         config = learnSessionConfig;
         config.setLearnSessionId(learnSessionId);
-        this.totalNumberOfCards = learningCards.size();
-        this.numberOfCardsPassed = 0;
     }
 
     public Optional<Card> getCurrentCard() {
@@ -54,17 +51,19 @@ public class LearnSession {
         return this;
     }
 
-    public AnswerResult checkAnswer(String answer, Card card) {
-        AnswerResult r = answerAuditor.checkResult(answer, card);
+    public AnswerResult checkAnswer(AnswerRequest answerRequest, Card card) {
+        AnswerResult r = answerAuditor.checkResult(answerRequest, card);
         if (r.isCorrect()) {
             card.nextRepState();
             card.setLastResultWasCorrect(true);
+            card.setLastLearned(LocalDateTime.now());
+            correctlyAnsweredCards.add(card);
         } else {
-            card.prevRepState();
+            card.resetRepState();
             card.setLastResultWasCorrect(false);
+            card.setLastLearned(LocalDateTime.now());
+            wronglyAnsweredCards.add(card);
         }
-
-        numberOfCardsPassed++;
 
         learnSessionEventCallback.save(card);
 
@@ -80,10 +79,22 @@ public class LearnSession {
     }
 
     public int getTotalNumberOfCards() {
-        return totalNumberOfCards;
+        return currentCard == null ? 0 : 1 + learningCards.size() + wronglyAnsweredCards.size() + correctlyAnsweredCards.size();
     }
 
     public int getNumberOfCardsPassed() {
-        return numberOfCardsPassed;
+        return wronglyAnsweredCards.size() + correctlyAnsweredCards.size();
+    }
+
+    public int numberOfWrongAnswers() {
+        return wronglyAnsweredCards.size();
+    }
+
+    public int numberOfCorrectAnswers() {
+        return correctlyAnsweredCards.size();
+    }
+
+    public LearnSessionStatistics getStatistics() {
+        return new LearnSessionStatistics(numberOfCorrectAnswers(), numberOfWrongAnswers());
     }
 }

@@ -53,12 +53,15 @@ public class LearnSessionController {
 
         LearnSession learnSession = learnSessionManager.startNewLearnSession(config);
 
-        return new LearnSessionDto(learnSession.getLearnSessionId().getValue(),
+        return new LearnSessionDto(
+                learnSession.getLearnSessionId().getValue(),
+                learnSession.getConfig().getCardSetId(),
                 null,
                 learnSession.getNumberOfCardsPassed(),
                 learnSession.getTotalNumberOfCards(),
                 learnSession.getConfig().isSpellChecking(),
-                null
+                null,
+                learnSession.getStatistics()
         );
     }
 
@@ -73,15 +76,18 @@ public class LearnSessionController {
         CardDto card = learnSession.getCurrentCard().map(cardMapper::mapToDto).orElseGet(() ->
                 learnSession.getNextCard().getCurrentCard()
                         .map(cardMapper::mapToDto)
-                        .orElseThrow(() -> new RestBadRequestException("No learn session is active"))
+                        .orElse(null)
         );
 
-        return new LearnSessionDto(learnSession.getLearnSessionId().getValue(),
+        return new LearnSessionDto(
+                learnSession.getLearnSessionId().getValue(),
+                learnSession.getConfig().getCardSetId(),
                 card,
                 learnSession.getNumberOfCardsPassed(),
                 learnSession.getTotalNumberOfCards(),
                 learnSession.getConfig().isSpellChecking(),
-                null
+                null,
+                learnSession.getStatistics()
         );
     }
 
@@ -95,15 +101,40 @@ public class LearnSessionController {
 
         Card card = learnSession.getCurrentCard().orElseThrow(() -> new RestBadRequestException("No current card available"));
 
-        AnswerResult answerResult = learnSession.checkAnswer(answerRequest.answer(), card);
+        AnswerResult answerResult = learnSession.checkAnswer(answerRequest, card);
 
         return new LearnSessionDto(
                 learnSession.getLearnSessionId().getValue(),
+                learnSession.getConfig().getCardSetId(),
                 cardMapper.mapToDto(card),
                 learnSession.getNumberOfCardsPassed(),
                 learnSession.getTotalNumberOfCards(),
                 learnSession.getConfig().isSpellChecking(),
-                answerResult
+                answerResult,
+                learnSession.getStatistics()
+        );
+    }
+
+
+    @Path("/{sessionId}/finish")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public LearnSessionDto finishSession(@PathParam("sessionId") String sessionId) {
+        LearnSession learnSession = learnSessionManager.getLearnSession(new LearnSessionId(sessionId))
+                .orElseThrow(() -> new RestBadRequestException("No such learn session"));
+
+        learnSessionManager.finish(learnSession);
+
+        return new LearnSessionDto(
+                learnSession.getLearnSessionId().getValue(),
+                learnSession.getConfig().getCardSetId(),
+                null,
+                learnSession.getNumberOfCardsPassed(),
+                learnSession.getTotalNumberOfCards(),
+                learnSession.getConfig().isSpellChecking(),
+                null,
+                learnSession.getStatistics()
         );
     }
 

@@ -70,6 +70,14 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
         this.lastLearned = lastLearned;
     }
 
+    public Card(String front, String back, int repState, LocalDateTime lastLearned, boolean lastAnswerWasCorrect) {
+        this.repetitionState = repState;
+        this.front = front;
+        this.back = back;
+        this.lastLearned = lastLearned;
+        this.lastResultWasCorrect = lastAnswerWasCorrect;
+    }
+
     public void addLink(HelpfulLink helpfulLink) {
         helpfulLink.setCard(this);
         this.helpfulLinks.add(helpfulLink);
@@ -80,8 +88,7 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
         repetitionState++;
     }
 
-    public void prevRepState() {
-        if (repetitionState > 1) repetitionState--;
-        // repState 0 is only for new cards. A card, that was already learned has the minimum state of 1
+    public void resetRepState() {
+        repetitionState = 1;
     }
 }

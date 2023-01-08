@@ -80,7 +80,7 @@ public class CardService {
             long cardSetId,
             int repState,
             boolean recentlyLearnedFirst,
-            int limit) {
+            int numberOfCards) {
         String orderDirection = recentlyLearnedFirst ? "DESC" : "ASC";
 
         LocalDateTime readyForRepetition = hardCodedMapping(repState);
@@ -89,17 +89,24 @@ public class CardService {
                 "SELECT c FROM Card c " +
                         "WHERE c.repetitionState = ?1 " +
                         "AND c.cardSet.id = ?2 " +
-                        "AND c.lastLearned <= ?3 " +
+                        "AND (c.lastLearned <= ?3 OR c.lastResultWasCorrect = false)" +
                         "ORDER BY c.lastLearned " + orderDirection,
                 repState,
                 cardSetId,
                 readyForRepetition);
 
-        if (limit > 0) {
-            return query.range(0, limit - 1).list();
+        if (numberOfCards > 0) {
+            List<Long> cardsWithLimitedSize = query.range(0, numberOfCards - 1)
+                    .list().stream()
+                    .map(Card::getId)
+                    .toList();
+
+            return fetchHelpfulLinks(cardsWithLimitedSize);
         }
 
-        return fetchHelpfulLinks(query.list().stream().map(Card::getId).toList());
+        // If number of cards is 0 for whatever reason, just return an empty list.
+        return new ArrayList<>();
+        // return fetchHelpfulLinks(query.list().stream().map(Card::getId).toList());
     }
 
     public List<Card> findCardsThatAreReadyForRepetitionByRepState(
@@ -160,7 +167,7 @@ public class CardService {
     private List<Card> fetchHelpfulLinks(List<Long> cardIds) {
         EntityManager em = cardRepository.getEntityManager();
         return em.createQuery("""
-                        SELECT DISTINCT c FROM Card c
+                        SELECT c FROM Card c
                         LEFT JOIN FETCH c.helpfulLinks
                         WHERE c.id IN (?1)
                         """, Card.class)

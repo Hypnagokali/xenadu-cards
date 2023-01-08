@@ -5,9 +5,7 @@ import de.xenadu.learningcards.persistence.entities.Card;
 import lombok.RequiredArgsConstructor;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +17,7 @@ public class LearnSessionManager implements Serializable, LearnSessionEventCallb
     private final CardService cardService;
 
     private final Map<String, LearnSession> learnSessionMap = new ConcurrentHashMap<>();
-    private final CardDistributor cardDistributor;
+    private final CardDistributionStrategy cardDistributionStrategy;
     private final AnswerAuditor answerAuditor;
 
     @PostConstruct
@@ -48,7 +46,7 @@ public class LearnSessionManager implements Serializable, LearnSessionEventCallb
             int diff = numberOfNewCards - newCards.size();
             learnSessionConfig.setNumberOfCardsForRepetition(learnSessionConfig.getNumberOfCardsForRepetition() + diff);
         }
-        final Map<Integer, Queue<Card>> cardsToRepeat = cardDistributor.distribute(
+        final Map<Integer, Queue<Card>> cardsToRepeat = cardDistributionStrategy.distribute(
                 learnSessionConfig
         );
 

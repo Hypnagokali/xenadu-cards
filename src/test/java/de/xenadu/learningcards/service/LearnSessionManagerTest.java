@@ -22,7 +22,7 @@ class LearnSessionManagerTest {
     @BeforeEach
     public void setUp() throws Exception {
         cardService = Mockito.mock(CardService.class);
-        learnSessionManager = new LearnSessionManager(cardService, new SimpleCardDistributor(cardService), new WordByWordAnswerAuditor());
+        learnSessionManager = new LearnSessionManager(cardService, new SimpleCardDistributionStrategy(cardService), new WordByWordAnswerAuditor());
     }
 
     @Test

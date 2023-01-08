@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @ApplicationScoped
-public class SimpleCardDistributor implements CardDistributor {
+public class SimpleCardDistributionStrategy implements CardDistributionStrategy {
 
     private final CardService cardService;
 
