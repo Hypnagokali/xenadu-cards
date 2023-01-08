@@ -167,7 +167,7 @@ public class CardService {
     private List<Card> fetchHelpfulLinks(List<Long> cardIds) {
         EntityManager em = cardRepository.getEntityManager();
         return em.createQuery("""
-                        SELECT c FROM Card c
+                        SELECT DISTINCT c FROM Card c
                         LEFT JOIN FETCH c.helpfulLinks
                         WHERE c.id IN (?1)
                         """, Card.class)

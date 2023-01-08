@@ -18,6 +18,8 @@ public class CardDto implements AbstractDto {
     private int repetitionState = 0;
     private String lastLearned = "1800-01-01 12:00";
     private long cardSetId = 0;
+
+    private String hint = "";
     private boolean noun;
     private String gender = null;
     private String additionalInfos = "";

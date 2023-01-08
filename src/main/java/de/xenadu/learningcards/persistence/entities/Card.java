@@ -40,6 +40,9 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     private Set<HelpfulLink> helpfulLinks = new LinkedHashSet<>();
 
     private int repetitionState = 0;
+
+    @Column(columnDefinition = "TEXT DEFAULT ''")
+    private String hint = "";
     private LocalDateTime lastLearned = LocalDateTime.of(1800, 1, 1, 0, 0);
 
     @ManyToOne
@@ -84,8 +87,12 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     }
 
     public void nextRepState() {
-        // for now, it is okay, when the card gets to an undefined repState.
-        repetitionState++;
+        if (lastResultWasCorrect) {
+            // for now, it is okay, when the card gets to an undefined repState.
+            repetitionState++;
+        } else {
+            lastResultWasCorrect = true;
+        }
     }
 
     public void resetRepState() {
