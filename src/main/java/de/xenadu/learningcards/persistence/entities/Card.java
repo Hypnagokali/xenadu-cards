@@ -96,6 +96,10 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     }
 
     public void resetRepState() {
-        repetitionState = 1;
+        if (repetitionState > 0) {
+            repetitionState = 1;
+        } else {
+            repetitionState = 0;
+        }
     }
 }

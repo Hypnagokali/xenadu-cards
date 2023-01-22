@@ -4,6 +4,7 @@ import de.xenadu.learningcards.persistence.entities.Card;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -20,6 +21,9 @@ public class LearnSession {
     private final Set<Card> correctlyAnsweredCards = new HashSet<>();
     private final Set<Card> wronglyAnsweredCards = new HashSet<>();
 
+    private final LocalDateTime started;
+    private LocalDateTime finished;
+
 
     private Card currentCard = null;
 
@@ -35,6 +39,7 @@ public class LearnSession {
         this.learnSessionEventCallback = learnSessionEventCallback;
         config = learnSessionConfig;
         config.setLearnSessionId(learnSessionId);
+        started = LocalDateTime.now();
     }
 
     public Optional<Card> getCurrentCard() {
@@ -73,8 +78,7 @@ public class LearnSession {
     }
 
     public void finish() {
-        // cards should already be saved.
-        // Todo: generate or publish statistics?
+        finished = LocalDateTime.now();
         learnSessionEventCallback.finish(this);
     }
 
@@ -95,6 +99,10 @@ public class LearnSession {
     }
 
     public LearnSessionStatistics getStatistics() {
-        return new LearnSessionStatistics(numberOfCorrectAnswers(), numberOfWrongAnswers());
+        if (finished == null) {
+            finished = LocalDateTime.now();
+        }
+        long seconds = ChronoUnit.SECONDS.between(started, finished);
+        return new LearnSessionStatistics(numberOfCorrectAnswers(), numberOfWrongAnswers(), seconds);
     }
 }

@@ -78,4 +78,8 @@ public class LearnSessionManager implements Serializable, LearnSessionEventCallb
     public void finish(LearnSession learnSession) {
         learnSessionMap.remove(learnSession.getLearnSessionId().getValue());
     }
+
+    public Collection<LearnSession> getAllLearnSessions() {
+        return learnSessionMap.values();
+    }
 }

@@ -12,10 +12,10 @@ import de.xenadu.learningcards.persistence.mapper.CardMapper;
 import de.xenadu.learningcards.service.CardSetService;
 import de.xenadu.learningcards.service.GetUserInfo;
 import de.xenadu.learningcards.service.LearnSessionManager;
+import io.quarkus.logging.Log;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
-import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -51,7 +51,9 @@ public class LearnSessionController {
         config.setOnlyRepetition(request.isOnlyRepetition());
         config.setUserId(userInfo.getId());
 
+        Log.infof("%s is starting a new learn session", userInfo.getEmail());
         LearnSession learnSession = learnSessionManager.startNewLearnSession(config);
+        Log.infof("There are currently %d learn session(s) open", learnSessionManager.getAllLearnSessions().size());
 
         return new LearnSessionDto(
                 learnSession.getLearnSessionId().getValue(),
@@ -61,7 +63,7 @@ public class LearnSessionController {
                 learnSession.getTotalNumberOfCards(),
                 learnSession.getConfig().isSpellChecking(),
                 null,
-                learnSession.getStatistics()
+                null
         );
     }
 
@@ -87,7 +89,7 @@ public class LearnSessionController {
                 learnSession.getTotalNumberOfCards(),
                 learnSession.getConfig().isSpellChecking(),
                 null,
-                learnSession.getStatistics()
+                null
         );
     }
 
@@ -111,7 +113,7 @@ public class LearnSessionController {
                 learnSession.getTotalNumberOfCards(),
                 learnSession.getConfig().isSpellChecking(),
                 answerResult,
-                learnSession.getStatistics()
+                null
         );
     }
 
@@ -120,11 +122,23 @@ public class LearnSessionController {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public LearnSessionDto finishSession(@PathParam("sessionId") String sessionId) {
+    public LearnSessionDto finishSession(@PathParam("sessionId") String sessionId,
+                                         @DefaultValue("false")
+                                         @QueryParam("cancel") boolean cancelSession) {
+        Log.infof("finish session: %s", sessionId);
+
         LearnSession learnSession = learnSessionManager.getLearnSession(new LearnSessionId(sessionId))
                 .orElseThrow(() -> new RestBadRequestException("No such learn session"));
 
         learnSessionManager.finish(learnSession);
+
+        if (cancelSession) {
+            // Do not save statistics
+            Log.info("Learn session was cancelled, therefore it statistics will not be persisted");
+        } else {
+            Log.info("ToDo: persist statistics of user");
+        }
+
 
         return new LearnSessionDto(
                 learnSession.getLearnSessionId().getValue(),
