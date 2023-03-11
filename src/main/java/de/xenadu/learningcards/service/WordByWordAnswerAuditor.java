@@ -5,8 +5,8 @@ import de.xenadu.learningcards.domain.AnswerRequest;
 import de.xenadu.learningcards.domain.AnswerResult;
 import de.xenadu.learningcards.domain.LearnSessionConfig;
 import de.xenadu.learningcards.persistence.entities.Card;
-
 import javax.enterprise.context.ApplicationScoped;
+
 import java.util.Arrays;
 import java.util.List;
 

@@ -5,6 +5,7 @@ import de.xenadu.learningcards.service.extern.api.UserService;
 import io.quarkus.oidc.IdToken;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,6 +17,8 @@ public class GetUserInfo {
     @IdToken
     JsonWebToken idToken;
 
+//    @Inject
+    @RestClient
     @Inject
     UserService userService;
 

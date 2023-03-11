@@ -55,11 +55,16 @@ dependencies {
     implementation 'io.smallrye.stork:stork-service-discovery-eureka'
     implementation 'io.quarkus:quarkus-resteasy-jackson'
     implementation 'io.quarkus:quarkus-resteasy-jaxb'
-    implementation group: 'io.quarkus', name: 'quarkus-rest-client-reactive'
+    implementation 'io.quarkus:quarkus-rest-client-reactive-jackson'
+    implementation 'io.quarkus:quarkus-rest-client-reactive'
 
 
+    // ToDo: undertow entfernen
     implementation 'io.quarkus:quarkus-undertow'
-    implementation 'io.quarkus:quarkus-jdbc-h2'
+//    implementation 'io.quarkus:quarkus-jdbc-h2'
+    // https://mvnrepository.com/artifact/io.quarkus/quarkus-jdbc-postgresql
+    implementation group: 'io.quarkus', name: 'quarkus-jdbc-postgresql', version: '2.16.4.Final'
+
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
 //    implementation 'io.quarkus:quarkus-resteasy-jackson'
     implementation 'io.quarkus:quarkus-arc'

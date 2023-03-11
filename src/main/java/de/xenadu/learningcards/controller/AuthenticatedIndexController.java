@@ -15,6 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -38,16 +39,16 @@ public class AuthenticatedIndexController {
     @Inject
     OidcSession oidcSession;
 
-    @GET
-    @Path("/dev")
-    @Produces(MediaType.TEXT_PLAIN)
-    public void startDev(@Context HttpServletResponse response) {
-        try {
-            response.sendRedirect("http://localhost:8081");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    @GET
+//    @Path("/dev")
+//    @Produces(MediaType.TEXT_PLAIN)
+//    public void startDev(@Context HttpServletResponse response) {
+//        try {
+//            response.sendRedirect("http://localhost:8081");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @GET
     @Path("/logout")

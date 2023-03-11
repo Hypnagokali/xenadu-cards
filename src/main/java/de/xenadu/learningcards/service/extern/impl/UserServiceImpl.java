@@ -19,7 +19,7 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ServerErrorException;
 import java.time.Duration;
 
-@ApplicationScoped
+//@ApplicationScoped
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -29,31 +29,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserInfo getUserByEmail(String email) {
-        final ServiceInfo serviceInfo = serviceLookup.getInfoOf("user_service");
-
-        WebClientOptions options = new WebClientOptions();
-        options.setLogActivity(true);
-
-        final HttpResponse<UserInfo> userInfoHttpResponse = WebClient.create(vertx, options)
-                .get(String.format("/users/%s",
-                        email))
-                .as(BodyCodec.json(UserInfo.class))
-                .host(serviceInfo.getInstance().getIpAddr())
-                .port(serviceInfo.getInstance().getPort())
-                .send()
-                .onItem()
-                .call(res -> Uni.createFrom().item(res))
-                .await()
-                .atMost(Duration.ofSeconds(10));
-
-        if (userInfoHttpResponse == null) {
-            throw new ServerErrorException("No response in 10 seconds error", 500);
-        }
-
-        if (userInfoHttpResponse.statusCode() >= 300) {
-            throw new BadRequestException("Request getUserByEmail ist fehlgeschlagen: " + userInfoHttpResponse.statusMessage());
-        }
-
-        return userInfoHttpResponse.body();
+        return null;
     }
+
+//    @Override
+//    public UserInfo getUserByEmail(String email) {
+//        final ServiceInfo serviceInfo = serviceLookup.getInfoOf("user_service");
+//
+//        WebClientOptions options = new WebClientOptions();
+//        options.setLogActivity(true);
+//
+//        final HttpResponse<UserInfo> userInfoHttpResponse = WebClient.create(vertx, options)
+//                .get(String.format("/users/%s",
+//                        email))
+//                .as(BodyCodec.json(UserInfo.class))
+//                .host(serviceInfo.getInstance().getIpAddr())
+//                .port(serviceInfo.getInstance().getPort())
+//                .send()
+//                .onItem()
+//                .call(res -> Uni.createFrom().item(res))
+//                .await()
+//                .atMost(Duration.ofSeconds(10));
+//
+//        if (userInfoHttpResponse == null) {
+//            throw new ServerErrorException("No response in 10 seconds error", 500);
+//        }
+//
+//        if (userInfoHttpResponse.statusCode() >= 300) {
+//            throw new BadRequestException("Request getUserByEmail ist fehlgeschlagen: " + userInfoHttpResponse.statusMessage());
+//        }
+//
+//        return userInfoHttpResponse.body();
+//    }
 }
