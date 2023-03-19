@@ -121,20 +121,21 @@ public class CardService {
         final LocalDateTime now = LocalDateTime.now();
         switch (repState) {
             case 0:
-                return now;
             case 1:
-                return now.minusHours(1);
+                return now;
             case 2:
-                return now.minusHours(12);
+                return now.minusHours(1);
             case 3:
-                return now.minusDays(2);
+                return now.minusHours(12);
             case 4:
-                return now.minusDays(8);
+                return now.minusDays(2);
             case 5:
-                return now.minusMonths(1);
+                return now.minusDays(8);
             case 6:
-                return now.minusMonths(2);
+                return now.minusMonths(1);
             case 7:
+                return now.minusMonths(2);
+            case 8:
                 return now.minusMonths(6);
         }
 
@@ -156,7 +157,7 @@ public class CardService {
                 "SELECT c FROM Card c " +
                         "WHERE c.repetitionState = ?1 " +
                         "AND c.cardSet.id = ?2 " +
-                        "ORDER BY c.lastLearned ASC", 0, cardSetId);
+                        "ORDER BY c.lastLearned DESC", 0, cardSetId);
 
         List<Long> cardIds = cardPanacheQuery.range(0, numberOfNewCards - 1).list()
                 .stream().map(Card::getId).toList();

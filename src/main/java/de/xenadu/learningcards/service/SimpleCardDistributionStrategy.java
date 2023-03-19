@@ -22,7 +22,7 @@ public class SimpleCardDistributionStrategy implements CardDistributionStrategy 
         Map<Integer, Queue<Card>> repStateCardsMapTemp = new TreeMap<>();
         Map<Integer, Queue<Card>> repStateCardsMapResult = new TreeMap<>();
         // step1: For each repState get the total number of cards available, with upper boundary numberOfCardsForDistribution
-        IntStream.range(1, 8).forEach(repState -> {
+        IntStream.rangeClosed(1, 8).forEach(repState -> {
             repStateCardsMapResult.put(repState, new LinkedList<>());
             repStateCardsMapTemp.put(repState, getCardsForState(config, numberOfCardsForDistribution, repState));
         });
