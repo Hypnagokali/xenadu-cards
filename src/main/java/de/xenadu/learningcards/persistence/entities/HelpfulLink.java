@@ -21,7 +21,7 @@ public class HelpfulLink implements AbstractEntity {
 
     private String name;
 
-    @Column(name = "link_value")
+    @Column(name = "link_value", columnDefinition = "TEXT DEFAULT ''")
     private String value;
 
     @ManyToOne
