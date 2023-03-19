@@ -88,12 +88,13 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     }
 
     public void nextRepState() {
-        if (lastResultWasCorrect) {
-            // for now, it is okay, when the card gets to an undefined repState.
-            repetitionState++;
-        } else {
-            lastResultWasCorrect = true;
-        }
+        repetitionState++;
+//        if (lastResultWasCorrect) {
+//            // for now, it is okay, when the card gets to an undefined repState.
+//            repetitionState++;
+//        } else {
+//            lastResultWasCorrect = true;
+//        }
     }
 
     public void resetRepState() {
