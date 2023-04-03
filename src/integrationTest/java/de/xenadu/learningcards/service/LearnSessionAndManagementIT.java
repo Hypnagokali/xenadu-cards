@@ -69,7 +69,7 @@ public class LearnSessionAndManagementIT {
         cardSetService.save(cardSet, userInfo);
         cardSetId = cardSet.getId();
 
-        learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor());
+        learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor(cardService));
     }
 
 
@@ -78,17 +78,18 @@ public class LearnSessionAndManagementIT {
         LearnSession learnSession =
             learnSessionManager.startNewLearnSession(learnSessionWithAllNewCards(cardSetId));
 
-        Card card = learnSession.getLearningCards().stream()
+        Card cardWithRepState6 = learnSession.getLearningCards().stream()
             .filter(c -> c.getRepetitionState() == 6)
             .findAny()
             .orElseThrow();
 
         AnswerResult answerResult = learnSession.checkAnswer(
             new AnswerRequest("boo! this should be wrong.", true),
-            card
+            cardWithRepState6
         );
+        learnSession.commit(answerResult, cardWithRepState6);
 
-        assertThat(card.getRepetitionState()).isEqualTo(1);
+        assertThat(cardWithRepState6.getRepetitionState()).isEqualTo(1);
     }
 
     @Test
@@ -105,8 +106,10 @@ public class LearnSessionAndManagementIT {
         Optional<Card> new1Card = learnSession.getLearningCards().stream().filter(c -> c.getFront().equals("new 1")).findAny();
 
         AnswerResult r = learnSession.checkAnswer(new AnswerRequest("neu 1", true), new1Card.get());
+        learnSession.commit(r, new1Card.get());
 
         assertThat(r.isCorrect()).isTrue();
+
         Optional<Card> loadedCard = cardService.findById(new1Card.get().getId());
 
         assertThat(loadedCard).isNotEmpty();

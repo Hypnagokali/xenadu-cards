@@ -1,6 +1,7 @@
 package de.xenadu.learningcards.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,9 +24,13 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = GENERATOR)
     @SequenceGenerator(name = GENERATOR, sequenceName = GENERATOR, allocationSize = 1)
     private long id;
-
     private String front = "";
+
     private String back = "";
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "card")
+    private Set<AlternativeAnswer> alternativeAnswers = new LinkedHashSet<>();
+
     private boolean noun;
 
 
@@ -100,5 +105,38 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
         } else {
             repetitionState = 0;
         }
+    }
+
+    /**
+     * Adds an alternative answer to the back side.
+     *
+     * @param alternative Alternative answer.
+     */
+    public void addAlternativeToBack(String alternative) {
+        AlternativeAnswer alternativeAnswer = new AlternativeAnswer(alternative, true);
+        this.alternativeAnswers.add(alternativeAnswer);
+        alternativeAnswer.setCard(this);
+    }
+
+    public void addAlternativeToFront(String alternative) {
+        AlternativeAnswer alternativeAnswer = new AlternativeAnswer(alternative, false);
+        this.alternativeAnswers.add(alternativeAnswer);
+        alternativeAnswer.setCard(this);
+    }
+
+    @Transient
+    public List<AlternativeAnswer> getAlternativeAnswersForBackSide() {
+        return alternativeAnswers
+            .stream()
+            .filter(AlternativeAnswer::isBackSide)
+            .toList();
+    }
+
+    @Transient
+    public List<AlternativeAnswer> getAlternativeAnswersForFrontSide() {
+        return alternativeAnswers
+            .stream()
+            .filter(AlternativeAnswer::isFrontSide)
+            .toList();
     }
 }

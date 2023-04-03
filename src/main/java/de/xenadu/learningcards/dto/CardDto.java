@@ -23,5 +23,7 @@ public class CardDto implements AbstractDto {
     private boolean noun;
     private String gender = null;
     private String additionalInfos = "";
+
+    private Set<AlternativeAnswerDto> alternativeAnswers = new LinkedHashSet<>();
     private Set<HelpfulLinkDto> helpfulLinks = new LinkedHashSet<>();
 }

@@ -1,3 +1,16 @@
 package de.xenadu.learningcards.domain;
 
-public record AnswerResult(boolean isCorrect, String expectedAnswer, String givenAnswer) {}
+import java.util.ArrayList;
+import java.util.List;
+
+public record AnswerResult(boolean isCorrect,
+                           String expectedAnswer,
+                           String givenAnswer,
+                           boolean isBackSide,
+                           List<String> alternatives) {
+
+    public AnswerResult(boolean isCorrect, String expectedAnswer, String givenAnswer) {
+        this(isCorrect, expectedAnswer, givenAnswer, true, new ArrayList<>());
+    }
+
+}

@@ -12,7 +12,7 @@ import org.mapstruct.*;
 @Mapper(
         unmappedSourcePolicy = ReportingPolicy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = {HelpfulLinkMapper.class, GenericEntityFactory.class},
+        uses = {HelpfulLinkMapper.class, AlternativeAnswerMapper.class, GenericEntityFactory.class},
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
         imports = {XenaduDateTimeFormatter.class},
         componentModel = "cdi"

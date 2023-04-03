@@ -1,8 +1,11 @@
 package de.xenadu.learningcards.service;
 
+import de.xenadu.learningcards.exceptions.EntityNotFoundException;
+import de.xenadu.learningcards.persistence.entities.AlternativeAnswer;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.HelpfulLink;
 import de.xenadu.learningcards.persistence.projections.RepStateCount;
+import de.xenadu.learningcards.persistence.repositories.AlternativeAnswerRepository;
 import de.xenadu.learningcards.persistence.repositories.CardRepository;
 import de.xenadu.learningcards.util.RepetitionStateMapping;
 import java.time.LocalDateTime;
@@ -21,10 +24,12 @@ import lombok.NoArgsConstructor;
 public class CardService {
 
     private CardRepository cardRepository;
+    private AlternativeAnswerRepository alternativeAnswerRepository;
 
     @Inject
-    public CardService(CardRepository cardRepository) {
+    public CardService(CardRepository cardRepository, AlternativeAnswerRepository alternativeAnswerRepository) {
         this.cardRepository = cardRepository;
+        this.alternativeAnswerRepository = alternativeAnswerRepository;
     }
 
     public List<Card> findAllByRepState(long cardSetId, int repState) {
@@ -118,8 +123,16 @@ public class CardService {
 
     @Transactional
     public void saveAll(Collection<Card> cards) {
-        for (Card card : cards) {
-            cardRepository.getEntityManager().merge(card);
-        }
+        cardRepository.saveAll(cards);
+    }
+
+    public Card findByIdAndFetchAlternatives(long cardId) {
+        return cardRepository.findByIdAndFetchAlternatives(cardId)
+            .orElseThrow(() -> new EntityNotFoundException("Card not found with ID = " + cardId));
+    }
+
+    @Transactional
+    public void removeAlternativeAnswerById(long cardId, long alternativeId) {
+        alternativeAnswerRepository.deleteById(alternativeId);
     }
 }

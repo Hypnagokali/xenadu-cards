@@ -1,23 +1,20 @@
 package de.xenadu.learningcards.controller;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
+
 import de.xenadu.learningcards.config.DevOidcSession;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
-import io.quarkus.oidc.OidcSession;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.response.Response;
 import io.smallrye.jwt.auth.cdi.NullJsonWebToken;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 @QuarkusTest
 class CardControllerIntegrationIT {
