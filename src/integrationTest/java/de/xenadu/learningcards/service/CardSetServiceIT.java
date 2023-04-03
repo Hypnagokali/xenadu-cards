@@ -44,7 +44,7 @@ public class CardSetServiceIT {
     }
 
     @Test
-    void loadCardSetInfos_ExpectCorrectReflectionOfTheData() {
+    void loadCardSetInfos_ExpectCorrectRepresentationOfTheData() {
         CardSetInfos cardSetInfos = cardSetService.getCardSetInfos(testCardSet.getId());
 
         assertThat(cardSetInfos.totalNumberOfNewCards()).isEqualTo(1);
@@ -55,6 +55,7 @@ public class CardSetServiceIT {
     public void createANewCardSetTest() throws Exception {
         CardSet cardSet = new CardSet();
         cardSet.setName("English");
+        cardSet.setUser(testUser());
 
         final CardSet savedCardSet = cardSetService.save(cardSet, testUser());
 
@@ -66,6 +67,7 @@ public class CardSetServiceIT {
     public void loadExistingCard_andUpdateCardTest() throws Exception {
         CardSet cardSet = new CardSet();
         cardSet.setName("Test Card Set");
+        cardSet.setUser(testUser());
         final CardSet savedCardSet = cardSetService.save(cardSet, testUser());
 
         Set<CardSet> cardSets = cardSetService.findAllByUserId(123);

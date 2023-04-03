@@ -1,14 +1,22 @@
 package de.xenadu.learningcards.service;
 
-import de.xenadu.learningcards.domain.*;
+import de.xenadu.learningcards.domain.AnswerAuditor;
+import de.xenadu.learningcards.domain.LearnSession;
+import de.xenadu.learningcards.domain.LearnSessionConfig;
+import de.xenadu.learningcards.domain.LearnSessionEventCallback;
+import de.xenadu.learningcards.domain.LearnSessionId;
 import de.xenadu.learningcards.persistence.entities.Card;
-import lombok.RequiredArgsConstructor;
-
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -31,7 +39,6 @@ public class LearnSessionManager implements Serializable, LearnSessionEventCallb
 
         // is it really a good idea to use the LearnSessionManager as a callback? (05.01.23, StS)
         final LearnSession learnSession = new LearnSession(learnSessionConfig, setOfCards, answerAuditor, this);
-
         learnSessionMap.put(learnSession.getLearnSessionId().getValue(), learnSession);
 
         return learnSession;

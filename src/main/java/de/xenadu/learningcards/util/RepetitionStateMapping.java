@@ -10,6 +10,11 @@ public final class RepetitionStateMapping {
     private RepetitionStateMapping() {
     }
 
+
+    public static int numberOfRepetitionStates() {
+        return 9;
+    }
+
     /**
      * Takes as arguments the repetition state and returns when to repeat the card.
      *

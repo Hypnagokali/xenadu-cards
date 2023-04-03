@@ -2,15 +2,25 @@ package de.xenadu.learningcards.service;
 
 import de.xenadu.learningcards.domain.LearnSessionConfig;
 import de.xenadu.learningcards.persistence.entities.Card;
-import lombok.RequiredArgsConstructor;
-
-import javax.enterprise.context.ApplicationScoped;
-import java.util.*;
+import de.xenadu.learningcards.util.RepetitionStateMapping;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
 import java.util.stream.IntStream;
+import javax.enterprise.context.ApplicationScoped;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @ApplicationScoped
 public class SimpleCardDistributionStrategy implements CardDistributionStrategy {
+
+
+    private static final int FIRST_HALF_START = 1;
+    private static final int FIRST_HALF_END = 4;
+    private static final int SECOND_HALF_START = 5;
+    private static final int SECOND_HALF_END = 8;
 
     private final CardService cardService;
 
@@ -21,11 +31,16 @@ public class SimpleCardDistributionStrategy implements CardDistributionStrategy 
 
         Map<Integer, Queue<Card>> repStateCardsMapTemp = new TreeMap<>();
         Map<Integer, Queue<Card>> repStateCardsMapResult = new TreeMap<>();
-        // step1: For each repState get the total number of cards available, with upper boundary numberOfCardsForDistribution
-        IntStream.rangeClosed(1, 8).forEach(repState -> {
-            repStateCardsMapResult.put(repState, new LinkedList<>());
-            repStateCardsMapTemp.put(repState, getCardsForState(config, numberOfCardsForDistribution, repState));
-        });
+        // step1: For each repState get the total number of cards available,
+        // with upper boundary numberOfCardsForDistribution
+        IntStream.range(1, RepetitionStateMapping.numberOfRepetitionStates())
+            .forEach(repState -> {
+                repStateCardsMapResult.put(repState, new LinkedList<>());
+                repStateCardsMapTemp.put(
+                    repState,
+                    getCardsForState(config, numberOfCardsForDistribution, repState)
+                );
+            });
 
         // step2: distribute the given number of cards to the repStates and return
         // i) get distributen 3:1
@@ -34,9 +49,9 @@ public class SimpleCardDistributionStrategy implements CardDistributionStrategy 
 
         // ii) check if number of wanted cards exceeds available cards
         int restOfFirstThree = 0;
-        int numberOfAllCardsOfTheFirstThreeRepStates = IntStream.range(1, 4)
-                .map(repState -> repStateCardsMapTemp.get(repState).size())
-                .reduce(0, Integer::sum);
+        int numberOfAllCardsOfTheFirstThreeRepStates = IntStream.range(FIRST_HALF_START, FIRST_HALF_END + 1)
+            .map(repState -> repStateCardsMapTemp.get(repState).size())
+            .reduce(0, Integer::sum);
 
         if (numberOfAllCardsOfTheFirstThreeRepStates < numberOfFreshestCards) {
             numberOfFreshestCards = numberOfAllCardsOfTheFirstThreeRepStates;
@@ -45,9 +60,12 @@ public class SimpleCardDistributionStrategy implements CardDistributionStrategy 
         }
 
         int cardsLeft = 0;
-        int numberOfAllCardsOfTheLastFourRepStates = IntStream.range(4, 8)
-                .map(repState -> repStateCardsMapTemp.get(repState).size())
-                .reduce(0, Integer::sum);
+        int numberOfAllCardsOfTheLastFourRepStates = IntStream.range(
+                SECOND_HALF_START,
+                SECOND_HALF_END + 1
+            )
+            .map(repState -> repStateCardsMapTemp.get(repState).size())
+            .reduce(0, Integer::sum);
 
         if (numberOfAllCardsOfTheLastFourRepStates < numberOfOlderCards) {
             cardsLeft = numberOfOlderCards - numberOfAllCardsOfTheLastFourRepStates;
@@ -64,14 +82,14 @@ public class SimpleCardDistributionStrategy implements CardDistributionStrategy 
         }
 
         distributeCards(
-                1, 3,
-                repStateCardsMapTemp, repStateCardsMapResult,
-                numberOfFreshestCards
+            FIRST_HALF_START, FIRST_HALF_END,
+            repStateCardsMapTemp, repStateCardsMapResult,
+            numberOfFreshestCards
         );
         distributeCards(
-                4, 7,
-                repStateCardsMapTemp, repStateCardsMapResult,
-                numberOfOlderCards
+            SECOND_HALF_START, SECOND_HALF_END,
+            repStateCardsMapTemp, repStateCardsMapResult,
+            numberOfOlderCards
         );
 
 
@@ -79,11 +97,11 @@ public class SimpleCardDistributionStrategy implements CardDistributionStrategy 
     }
 
     private void distributeCards(
-            int firstRepState,
-            int lastRepStateInclusive,
-            Map<Integer, Queue<Card>> repStateCardsMapTemp,
-            Map<Integer, Queue<Card>> repStateCardsMapResult,
-            int numberOfCardsToDistribute) {
+        int firstRepState,
+        int lastRepStateInclusive,
+        Map<Integer, Queue<Card>> repStateCardsMapTemp,
+        Map<Integer, Queue<Card>> repStateCardsMapResult,
+        int numberOfCardsToDistribute) {
 
         while (numberOfCardsToDistribute > 0) {
             for (int i = firstRepState; i <= lastRepStateInclusive; i++) {
@@ -96,12 +114,13 @@ public class SimpleCardDistributionStrategy implements CardDistributionStrategy 
         }
     }
 
-    private Queue<Card> getCardsForState(LearnSessionConfig config, int numberOfCards, int repState) {
+    private Queue<Card> getCardsForState(LearnSessionConfig config, int numberOfCards,
+                                         int repState) {
         final List<Card> cards = cardService.findCardsThatAreReadyForRepetitionByRepState(
-                config.getCardSetId(),
-                repState,
-                config.isRecentlyLearnedFirst(),
-                numberOfCards
+            config.getCardSetId(),
+            repState,
+            config.isRecentlyLearnedFirst(),
+            numberOfCards
         );
 
         return new LinkedList<>(cards);

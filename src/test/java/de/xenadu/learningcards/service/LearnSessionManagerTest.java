@@ -4,6 +4,10 @@ import de.xenadu.learningcards.domain.LearnSession;
 import de.xenadu.learningcards.domain.LearnSessionConfig;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -14,19 +18,22 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 
 
 @SuppressWarnings("ALL")
-@Disabled
 class LearnSessionManagerTest {
 
     LearnSessionManager learnSessionManager;
     private CardService cardService;
 
+    CardDistributionStrategy cardDistributionStrategy;
+
     @BeforeEach
     public void setUp() throws Exception {
         cardService = Mockito.mock(CardService.class);
-        learnSessionManager = new LearnSessionManager(cardService, new SimpleCardDistributionStrategy(cardService), new WordByWordAnswerAuditor());
+        cardDistributionStrategy = Mockito.mock(CardDistributionStrategy.class);
+        learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor());
     }
 
     @Test
@@ -55,6 +62,9 @@ class LearnSessionManagerTest {
         Mockito.when(cardService.findNewCards(1, 2))
                 .thenReturn(new ArrayList<>(newCards()));
 
+        Mockito.when(cardDistributionStrategy.distribute(learnSessionConfig))
+            .thenReturn(oldCardsDistributed());
+
         final LearnSession learnSession = learnSessionManager
                 .startNewLearnSession(learnSessionConfig);
 
@@ -62,6 +72,13 @@ class LearnSessionManagerTest {
         Card cardNew2 = learnSession.getNextCard().getCurrentCard().get();
         Card cardOld = learnSession.getNextCard().getCurrentCard().get();
 
+    }
+
+    private Map<Integer, Queue<Card>> oldCardsDistributed() {
+        Set<Card> cards = oldCards();
+        return new HashMap<>() {{
+            put(1, new LinkedList<>(cards));
+        }};
     }
 
     private Set<Card> newCards() {

@@ -40,9 +40,9 @@ public class LearnSessionAndManagementIT {
         cardSet.setUser(userInfo);
 
         LocalDateTime rep1DateTime = LocalDateTime.now().minusHours(2);
-        LocalDateTime rep3DateTime = LocalDateTime.now().minusDays(2);
-        LocalDateTime notInRep3DateTime = LocalDateTime.now().minusDays(2).plusHours(2);
-        LocalDateTime rep5DateTime = LocalDateTime.now().minusMonths(1);
+        LocalDateTime rep4DateTime = LocalDateTime.now().minusDays(2);
+        LocalDateTime notInRep4DateTime = LocalDateTime.now().minusDays(2).plusHours(2);
+        LocalDateTime rep6DateTime = LocalDateTime.now().minusMonths(1);
 
 
         cardSet.addCard(new Card("new 1", "neu 1"));
@@ -50,21 +50,21 @@ public class LearnSessionAndManagementIT {
 
         cardSet.addCard(new Card("new 3", "neu 3"));
 
-        cardSet.addCard(new Card("wrong answer", "falsche antwort", 1, LocalDateTime.now(), false));
-
+        // Attention: lastAnswerWasCorrect will be ignored in this tests
         cardSet.addCard(new Card("rep 1/1", "rep 1", 1, rep1DateTime, true));
-        cardSet.addCard(new Card("rep 3/1", "rep 3", 3, rep3DateTime, true));
-        cardSet.addCard(new Card("rep 3/2 (not in)", "not in rep 3", 3, notInRep3DateTime, true));
-        cardSet.addCard(new Card("rep 3/3", "rep 3", 3, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/1", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/2", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/3", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/4", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/5", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/6", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/7", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/8", "rep 5", 5, rep5DateTime, true));
-        cardSet.addCard(new Card("rep 5/9", "rep 5", 5, rep5DateTime, true));
+        cardSet.addCard(new Card("rep 4/1", "rep 4", 4, rep4DateTime, true));
+        cardSet.addCard(new Card("rep 4/2 (not in)", "not in rep 4", 4, notInRep4DateTime, true));
+        cardSet.addCard(new Card("rep 4/3", "rep 4", 4, rep4DateTime, true));
+
+        cardSet.addCard(new Card("rep 6/1", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/2", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/3", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/4", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/5", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/6", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/7", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/8", "rep 6", 6, rep6DateTime, true));
+        cardSet.addCard(new Card("rep 6/9", "rep 6", 6, rep6DateTime, true));
 
         cardSetService.save(cardSet, userInfo);
         cardSetId = cardSet.getId();
@@ -79,7 +79,7 @@ public class LearnSessionAndManagementIT {
             learnSessionManager.startNewLearnSession(learnSessionWithAllNewCards(cardSetId));
 
         Card card = learnSession.getLearningCards().stream()
-            .filter(c -> c.getRepetitionState() == 5)
+            .filter(c -> c.getRepetitionState() == 6)
             .findAny()
             .orElseThrow();
 
@@ -128,27 +128,25 @@ public class LearnSessionAndManagementIT {
 
         assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("new");
         assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("new");
-        // wrong answers are always repeated
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("wrong");
         assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 1/");
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 3/").doesNotContain("(not in)");
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 3/").doesNotContain("(not in)");
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 5/");
+        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 4/").doesNotContain("(not in)");
+        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 4/").doesNotContain("(not in)");
+        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 6/");
     }
 
     @Test
-    void whenTheBoundariesForNewCardsAreGreaterThanNewCards_ExpectTheDifferenceInSetOfCardsForRepetition() {
+    void whenTheBoundariesForNewCardsAreGreaterThanNewCards_ExpectTheDifferenceInSetOfCardsForRepetitionIfPossible() {
         LearnSession learnSession = learnSessionManager.startNewLearnSession(learnSessionWith4NewCardsAnd3Reps(cardSetId));
+        // Should be lead to all 3 new cards and 4 cards to repeat
 
         assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("new");
         assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("new");
         assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("new");
-        // wrong answers will always be repeated:
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("wrong");
+
         assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 1/");
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 3/").doesNotContain("(not in)");
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 3/").doesNotContain("(not in)");
-        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 5/");
+        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 4/").doesNotContain("(not in)");
+        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 4/").doesNotContain("(not in)");
+        assertThat(learnSession.getNextCard().getCurrentCard().get().getFront()).contains("rep 6/");
     }
 
     private LearnSessionConfig learnSessionWith4NewCardsAnd3Reps(long cardSetId) {
