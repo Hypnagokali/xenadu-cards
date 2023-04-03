@@ -63,16 +63,15 @@ dependencies {
 
     // ToDo: undertow entfernen
     implementation 'io.quarkus:quarkus-undertow'
-//    implementation 'io.quarkus:quarkus-jdbc-h2'
-    // https://mvnrepository.com/artifact/io.quarkus/quarkus-jdbc-postgresql
     implementation group: 'io.quarkus', name: 'quarkus-jdbc-postgresql', version: '2.16.4.Final'
 
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
 //    implementation 'io.quarkus:quarkus-resteasy-jackson'
     implementation 'io.quarkus:quarkus-arc'
 
+    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.6'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.17.6'
     testImplementation group: 'org.jboss.weld', name: 'weld-junit5', version: '2.0.2.Final'
-
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'

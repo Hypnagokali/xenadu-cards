@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Path("/api/card-sets/{cardSetId}/cards")
 @RequiredArgsConstructor
-@Authenticated
 public class CardController {
 
     private final CardService cardService;

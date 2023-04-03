@@ -2,7 +2,6 @@ package de.xenadu.learningcards.controller;
 
 import io.quarkus.oidc.IdToken;
 import io.quarkus.oidc.OidcSession;
-import io.quarkus.oidc.RefreshToken;
 import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.groups.UniAwait;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -15,7 +14,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

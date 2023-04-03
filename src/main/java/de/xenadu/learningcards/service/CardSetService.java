@@ -2,7 +2,6 @@ package de.xenadu.learningcards.service;
 
 import de.xenadu.learningcards.domain.CardSetInfos;
 import de.xenadu.learningcards.domain.UserInfo;
-import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.repositories.CardRepository;
 import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;

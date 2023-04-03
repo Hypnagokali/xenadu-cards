@@ -1,5 +1,6 @@
 package de.xenadu.learningcards.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,10 +45,15 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
 
     @Column(columnDefinition = "TEXT DEFAULT ''")
     private String hint = "";
-    private LocalDateTime lastLearned = LocalDateTime.of(1800, 1, 1, 0, 0);
+    private LocalDateTime lastLearned = initDate();
+
+    private static LocalDateTime initDate() {
+        return LocalDateTime.of(1800, 1, 1, 0, 0);
+    }
 
     @ManyToOne
     @JoinColumn(name = "card_set_id")
+    @JsonIgnore
     private CardSet cardSet;
 
     public Card(String front, String back) {
@@ -55,30 +61,27 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
         this.back = back;
     }
 
-    public Card(long id, String front, String back) {
-        this.id = id;
-        this.front = front;
-        this.back = back;
+    public Card(String front, String back, int repState) {
+        this(front, back);
+        this.repetitionState = repState;
     }
 
-    public Card(String front, String back, int repState) {
-        this.repetitionState = repState;
-        this.front = front;
-        this.back = back;
+    public Card(long id, String front, String back) {
+        this(front, back);
+        this.id = id;
     }
 
     public Card(String front, String back, int repState, LocalDateTime lastLearned) {
-        this.repetitionState = repState;
-        this.front = front;
-        this.back = back;
-        this.lastLearned = lastLearned;
+        this(front, back, repState);
+        if (lastLearned == null) {
+            this.lastLearned = initDate();
+        } else {
+            this.lastLearned = lastLearned;
+        }
     }
 
     public Card(String front, String back, int repState, LocalDateTime lastLearned, boolean lastAnswerWasCorrect) {
-        this.repetitionState = repState;
-        this.front = front;
-        this.back = back;
-        this.lastLearned = lastLearned;
+        this(front, back, repState, lastLearned);
         this.lastResultWasCorrect = lastAnswerWasCorrect;
     }
 
@@ -89,12 +92,6 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
 
     public void nextRepState() {
         repetitionState++;
-//        if (lastResultWasCorrect) {
-//            // for now, it is okay, when the card gets to an undefined repState.
-//            repetitionState++;
-//        } else {
-//            lastResultWasCorrect = true;
-//        }
     }
 
     public void resetRepState() {

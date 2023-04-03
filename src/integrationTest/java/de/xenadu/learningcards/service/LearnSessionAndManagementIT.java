@@ -72,6 +72,25 @@ public class LearnSessionAndManagementIT {
         learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor());
     }
 
+
+    @Test
+    void whenCardWasIncorrectlyAnswered_ExpectRepStateIs1() {
+        LearnSession learnSession =
+            learnSessionManager.startNewLearnSession(learnSessionWithAllNewCards(cardSetId));
+
+        Card card = learnSession.getLearningCards().stream()
+            .filter(c -> c.getRepetitionState() == 5)
+            .findAny()
+            .orElseThrow();
+
+        AnswerResult answerResult = learnSession.checkAnswer(
+            new AnswerRequest("boo! this should be wrong.", true),
+            card
+        );
+
+        assertThat(card.getRepetitionState()).isEqualTo(1);
+    }
+
     @Test
     void whenFinishingALearnSession_ExpectSessionWillRemovedFromSessionManager() {
         LearnSession learnSession = learnSessionManager.startNewLearnSession(learnSessionWithAllNewCards(cardSetId));

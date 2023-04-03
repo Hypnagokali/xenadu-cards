@@ -1,5 +1,6 @@
 package de.xenadu.learningcards.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class HelpfulLink implements AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "card_id")
+    @JsonIgnore
     private Card card;
 
     public HelpfulLink(String name, String value) {
