@@ -1,5 +1,9 @@
 package de.xenadu.learningcards.dto;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.entities.HelpfulLink;
@@ -8,23 +12,35 @@ import de.xenadu.learningcards.persistence.repositories.CardRepository;
 import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
 import de.xenadu.learningcards.service.CardService;
 import de.xenadu.learningcards.service.CardSetService;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 
 public class CardMapperIT {
 
     CardMapper cardMapper;
     CardService cardService;
     CardSetService cardSetService;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        cardService = new CardService(produceCardRepository());
+        cardSetService = new CardSetService(produceCardSetRepository(), null);
+
+        HelpfulLinkMapper helpfulLinkMapper = new HelpfulLinkMapperImpl();
+        helpfulLinkMapper.setCardService(cardService);
+
+        cardMapper = new CardMapperImpl(getHelpfulLinkMapper(), alternativeAnswerMapper(), produceCardEntityFactory());
+        // cardMapper.setCardSetService(cardSetService);
+    }
+
+    private AlternativeAnswerMapper alternativeAnswerMapper() {
+        return new AlternativeAnswerMapperImpl();
+    }
 
     CardSetRepository produceCardSetRepository() {
         final CardSetRepository mock = Mockito.mock(CardSetRepository.class);
@@ -49,17 +65,6 @@ public class CardMapperIT {
         return new Card(123, "front", "back");
     }
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        cardService = new CardService(produceCardRepository());
-        cardSetService = new CardSetService(produceCardSetRepository(), null);
-
-        HelpfulLinkMapper helpfulLinkMapper = new HelpfulLinkMapperImpl();
-        helpfulLinkMapper.setCardService(cardService);
-
-        cardMapper = new CardMapperImpl(getHelpfulLinkMapper(), produceCardEntityFactory());
-        // cardMapper.setCardSetService(cardSetService);
-    }
 
     private GenericEntityFactory produceCardEntityFactory() {
         final GenericEntityFactory mock = Mockito.mock(GenericEntityFactory.class);
@@ -79,8 +84,6 @@ public class CardMapperIT {
     @Test
     public void mapToEntity() throws Exception {
         CardSetService cardSetService = Mockito.mock(CardSetService.class);
-
-
 
         CardSet cardSet = new CardSet(3, "Card Set");
         Mockito.when(cardSetService.findById(3)).thenReturn(Optional.of(cardSet));

@@ -4,9 +4,14 @@ import de.xenadu.learningcards.persistence.entities.AlternativeAnswer;
 import de.xenadu.learningcards.persistence.entities.Card;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
 import lombok.Getter;
-
 
 
 @Getter
@@ -72,10 +77,11 @@ public class LearnSession {
     }
 
     public int getTotalNumberOfCards() {
-        return currentCard == null
+        int currentCardValue = currentCard == null
             ? 0
-            : 1 + learningCards.size()
-            + wronglyAnsweredCards.size()
+            : 1 + learningCards.size();
+
+        return currentCardValue + wronglyAnsweredCards.size()
             + correctlyAnsweredCards.size();
     }
 
@@ -107,7 +113,7 @@ public class LearnSession {
      * Add a new alternative answer to the card.
      *
      * @param answerResult The previous result.
-     * @param card Current card.
+     * @param card         Current card.
      * @return Corrected answer result.
      */
     public AnswerResult addNewAnswer(AnswerResult answerResult, Card card) {
@@ -141,7 +147,7 @@ public class LearnSession {
      * Apply the AnswerResult to the card.
      *
      * @param answerResult Result.
-     * @param card Current card.
+     * @param card         Current card.
      */
     public void commit(AnswerResult answerResult, Card card) {
         if (answerResult.isCorrect()) {

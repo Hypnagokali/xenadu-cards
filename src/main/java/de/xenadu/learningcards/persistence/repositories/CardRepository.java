@@ -6,7 +6,9 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -47,7 +49,7 @@ public class CardRepository implements PanacheRepository<Card> {
                     .map(Card::getId)
                     .toList();
 
-            List<Card> cards = fetchHelpfulLinks(cardsWithLimitedSize);
+            List<Card> cards = fetchHelpfulLinksAndAnswers(cardsWithLimitedSize);
             // The second query would destroy the order of the first. Therefor the ordering
             // will be done here - manually:
             if (recentlyLearnedFirst) {
@@ -76,14 +78,31 @@ public class CardRepository implements PanacheRepository<Card> {
         return getOrderedCardsWithHelpfulLinks(recentlyLearnedFirst, numberOfNewCards, cardPanacheQuery);
     }
 
-    private List<Card> fetchHelpfulLinks(List<Long> cardIds) {
+    private List<Card> fetchHelpfulLinksAndAnswers(List<Long> cardIds) {
         EntityManager em = getEntityManager();
         return em.createQuery("""
             SELECT DISTINCT c FROM Card c
             LEFT JOIN FETCH c.helpfulLinks
+            LEFT JOIN FETCH c.alternativeAnswers
             WHERE c.id IN (?1)
             """, Card.class)
             .setParameter(1, cardIds)
             .getResultList();
+    }
+
+    public void saveAll(Collection<Card> cards) {
+        for (Card card : cards) {
+            getEntityManager().merge(card);
+        }
+    }
+
+    public Optional<Card> findByIdAndFetchAlternatives(long id) {
+        return Optional.ofNullable(getEntityManager().createQuery("""
+                SELECT DISTINCT c FROM Card c
+                    LEFT JOIN FETCH c.alternativeAnswers
+                WHERE c.id = ?1
+                """, Card.class)
+            .setParameter(1, id)
+            .getSingleResult());
     }
 }

@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.mockito.ArgumentMatchers.any;
 
 
@@ -35,8 +36,22 @@ class LearnSessionManagerTest {
     @BeforeEach
     public void setUp() throws Exception {
         cardService = Mockito.mock(CardService.class);
+        Mockito.when(cardService.findByIdAndFetchAlternatives(any()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
         cardDistributionStrategy = Mockito.mock(CardDistributionStrategy.class);
-        learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor());
+        learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor(cardService));
+    }
+
+    @Test
+    void whenCheckBackSideIsFalse_ExpectCardFrontWillBeChecked() {
+        LearnSessionConfig learnSessionConfig = configureLearnSessionWithTwoNewCards();
+        LearnSession learnSession = learnSessionManager.startNewLearnSession(learnSessionConfig);
+        Card card = learnSession.getNextCard().getCurrentCard().get();
+        AnswerResult answerResult =
+            learnSession.checkAnswer(new AnswerRequest("new 1", false), card);
+
+        assertThat(answerResult.isCorrect()).isTrue();
     }
 
     @Test

@@ -1,5 +1,6 @@
 package de.xenadu.learningcards.service;
 
+import de.xenadu.learningcards.exceptions.EntityNotFoundException;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.HelpfulLink;
 import de.xenadu.learningcards.persistence.projections.RepStateCount;
@@ -118,8 +119,11 @@ public class CardService {
 
     @Transactional
     public void saveAll(Collection<Card> cards) {
-        for (Card card : cards) {
-            cardRepository.getEntityManager().merge(card);
-        }
+        cardRepository.saveAll(cards);
+    }
+
+    public Card findByIdAndFetchAlternatives(Card card) {
+        return cardRepository.findByIdAndFetchAlternatives(card.getId())
+            .orElseThrow(() -> new EntityNotFoundException("Card not found with ID = " + card.getId()));
     }
 }

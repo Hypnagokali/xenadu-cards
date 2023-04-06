@@ -8,15 +8,19 @@ import de.xenadu.learningcards.persistence.entities.Card;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Checking answer word by word.
+ */
 @ApplicationScoped
 @RequiredArgsConstructor
 public class WordByWordAnswerAuditor implements AnswerAuditor {
+
+
+    private final CardService cardService;
 
     private static final String[] specialChars = {
         "!", ".", ",", "-", "_", ";", ":", "?"
@@ -27,7 +31,10 @@ public class WordByWordAnswerAuditor implements AnswerAuditor {
     public AnswerResult checkResult(AnswerRequest answerRequest, Card card) {
         List<String> correctAnswers = new ArrayList<>();
 
-        if (answerRequest.checkBackSite()) {
+        card = cardService.findByIdAndFetchAlternatives(card);
+
+
+        if (answerRequest.checkBackSide()) {
             correctAnswers.add(card.getBack());
             correctAnswers.addAll(card.getAlternativeAnswers().stream()
                 .filter(AlternativeAnswer::isBackSide)
@@ -76,7 +83,7 @@ public class WordByWordAnswerAuditor implements AnswerAuditor {
     private AnswerResult getAnswer(AnswerRequest request, Card card, boolean correct) {
         List<String> alternatives;
 
-        if (request.checkBackSite()) {
+        if (request.checkBackSide()) {
             alternatives = card.getAlternativeAnswersForBackSide()
                 .stream()
                 .map(AlternativeAnswer::getAnswer)
@@ -92,7 +99,7 @@ public class WordByWordAnswerAuditor implements AnswerAuditor {
             correct,
             card.getBack(),
             request.answer(),
-            request.checkBackSite(),
+            request.checkBackSide(),
             alternatives
         );
     }

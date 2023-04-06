@@ -6,5 +6,8 @@
 
 <suppressions>
     <suppress checks="JavadocType" files=".*Test\.java"/>
+    <suppress checks="JavadocType" files=".*IT\.java"/>
+    <suppress checks="TypeName" files=".*IT\.java"/>
     <suppress checks="MissingJavadocMethodCheck" files=".*Test\.java"/>
+    <suppress checks="MissingJavadocMethodCheck" files=".*IT\.java"/>
 </suppressions>

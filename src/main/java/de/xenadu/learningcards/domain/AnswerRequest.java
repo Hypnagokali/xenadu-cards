@@ -1,4 +1,4 @@
 package de.xenadu.learningcards.domain;
 
-public record AnswerRequest(String answer, boolean checkBackSite) {
+public record AnswerRequest(String answer, boolean checkBackSide) {
 }

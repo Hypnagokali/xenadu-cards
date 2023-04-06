@@ -6,6 +6,7 @@ import de.xenadu.learningcards.dto.LearnSessionDto;
 import de.xenadu.learningcards.dto.StartLearnSessionRequest;
 import de.xenadu.learningcards.exceptions.RestBadRequestException;
 import de.xenadu.learningcards.exceptions.RestForbiddenException;
+import de.xenadu.learningcards.exceptions.RestNotFoundException;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.mapper.CardMapper;
@@ -13,6 +14,7 @@ import de.xenadu.learningcards.service.CardSetService;
 import de.xenadu.learningcards.service.GetUserInfo;
 import de.xenadu.learningcards.service.LearnSessionManager;
 import io.quarkus.logging.Log;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
@@ -93,17 +95,88 @@ public class LearnSessionController {
         );
     }
 
+    @Path("/{sessionId}/add-alternative")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public LearnSessionDto addAlternative(@PathParam("sessionId") String sessionId,
+                                          @RequestBody AnswerResult answerResult) {
+
+        LearnSession learnSession = learnSessionManager.getLearnSession(
+                new LearnSessionId(sessionId)
+            )
+            .orElseThrow(() -> new RestBadRequestException("No such learn session"));
+
+        Card currentCard = learnSession.getCurrentCard()
+            .orElseThrow(() -> new RestNotFoundException("No current card found"));
+
+
+        answerResult = learnSession.addNewAnswer(answerResult, currentCard);
+
+        // is called by front end
+        // learnSession.commit(answerResult, currentCard);
+
+
+        return new LearnSessionDto(
+            learnSession.getLearnSessionId().getValue(),
+            learnSession.getConfig().getCardSetId(),
+            cardMapper.mapToDto(currentCard),
+            learnSession.getNumberOfCardsPassed(),
+            learnSession.getTotalNumberOfCards(),
+            learnSession.getConfig().isSpellChecking(),
+            answerResult,
+            null
+        );
+
+
+    }
+
     @Path("/{sessionId}/check")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public LearnSessionDto checkCard(@PathParam("sessionId") String sessionId, @RequestBody AnswerRequest answerRequest) {
-        LearnSession learnSession = learnSessionManager.getLearnSession(new LearnSessionId(sessionId))
-                .orElseThrow(() -> new RestBadRequestException("No such learn session"));
+    public LearnSessionDto checkCard(@PathParam("sessionId") String sessionId,
+                                     @RequestBody AnswerRequest answerRequest) {
+        LearnSession learnSession = learnSessionManager.getLearnSession(
+                new LearnSessionId(sessionId)
+            )
+            .orElseThrow(() -> new RestBadRequestException("No such learn session"));
 
         Card card = learnSession.getCurrentCard().orElseThrow(() -> new RestBadRequestException("No current card available"));
 
         AnswerResult answerResult = learnSession.checkAnswer(answerRequest, card);
+
+        if (answerResult.isCorrect()) {
+            learnSession.commit(answerResult, card);
+        }
+
+        return new LearnSessionDto(
+            learnSession.getLearnSessionId().getValue(),
+            learnSession.getConfig().getCardSetId(),
+            cardMapper.mapToDto(card),
+            learnSession.getNumberOfCardsPassed(),
+            learnSession.getTotalNumberOfCards(),
+            learnSession.getConfig().isSpellChecking(),
+            answerResult,
+            null
+        );
+    }
+
+
+    @Path("/{sessionId}/commit")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public LearnSessionDto commitAnswer(@PathParam("sessionId") String sessionId,
+                                     @RequestBody AnswerResult answerResult) {
+        LearnSession learnSession = learnSessionManager.getLearnSession(
+            new LearnSessionId(sessionId)
+            )
+            .orElseThrow(() -> new RestBadRequestException("No such learn session"));
+
+        Card card = learnSession.getCurrentCard().orElseThrow(() -> new RestBadRequestException("No current card available"));
+
+        learnSession.commit(answerResult, card);
 
         return new LearnSessionDto(
                 learnSession.getLearnSessionId().getValue(),

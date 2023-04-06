@@ -69,7 +69,7 @@ public class LearnSessionAndManagementIT {
         cardSetService.save(cardSet, userInfo);
         cardSetId = cardSet.getId();
 
-        learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor());
+        learnSessionManager = new LearnSessionManager(cardService, cardDistributionStrategy, new WordByWordAnswerAuditor(cardService));
     }
 
 
