@@ -36,7 +36,7 @@ class LearnSessionManagerTest {
     @BeforeEach
     public void setUp() throws Exception {
         cardService = Mockito.mock(CardService.class);
-        Mockito.when(cardService.findByIdAndFetchAlternatives(any()))
+        Mockito.when(cardService.findByIdAndFetchAlternatives(any(Long.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         cardDistributionStrategy = Mockito.mock(CardDistributionStrategy.class);

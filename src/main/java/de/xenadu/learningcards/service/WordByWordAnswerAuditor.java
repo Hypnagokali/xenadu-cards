@@ -31,7 +31,7 @@ public class WordByWordAnswerAuditor implements AnswerAuditor {
     public AnswerResult checkResult(AnswerRequest answerRequest, Card card) {
         List<String> correctAnswers = new ArrayList<>();
 
-        card = cardService.findByIdAndFetchAlternatives(card);
+        card = cardService.findByIdAndFetchAlternatives(card.getId());
 
 
         if (answerRequest.checkBackSide()) {

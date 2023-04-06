@@ -1,17 +1,21 @@
 package de.xenadu.learningcards.controller;
 
 import de.xenadu.learningcards.domain.UserInfo;
+import de.xenadu.learningcards.dto.AlternativeAnswerDto;
 import de.xenadu.learningcards.dto.CardDto;
 import de.xenadu.learningcards.exceptions.RestBadRequestException;
 import de.xenadu.learningcards.exceptions.RestForbiddenException;
+import de.xenadu.learningcards.persistence.entities.AlternativeAnswer;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
+import de.xenadu.learningcards.persistence.mapper.AlternativeAnswerMapper;
 import de.xenadu.learningcards.persistence.mapper.CardMapper;
 import de.xenadu.learningcards.persistence.mapper.HelpfulLinkMapper;
 import de.xenadu.learningcards.service.CardService;
 import de.xenadu.learningcards.service.CardSetService;
 import de.xenadu.learningcards.service.GetUserInfo;
 import io.quarkus.security.Authenticated;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.jboss.resteasy.reactive.ResponseStatus;
 
@@ -30,6 +34,8 @@ public class CardController {
     private final CardSetService cardSetService;
     private final GetUserInfo getUserInfo;
     private final HelpfulLinkMapper helpfulLinkMapper;
+
+    private final AlternativeAnswerMapper alternativeAnswerMapper;
 
     private final CardMapper cardMapper;
 
@@ -105,6 +111,14 @@ public class CardController {
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
     public List<CardDto> allCardsOfCardSet(@PathParam("cardSetId") long cardSetId) {
+        assertCardSetIsOwnedByUser(cardSetId);
+
+        return cardService.findAllByCardSetId(cardSetId)
+                .stream().map(cardMapper::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    private void assertCardSetIsOwnedByUser(long cardSetId) {
         final UserInfo userInfo = getUserInfo.authenticatedUser();
 
         final CardSet cardSet = cardSetService.findById(cardSetId).orElseThrow(RestBadRequestException::new);
@@ -112,10 +126,6 @@ public class CardController {
         if (cardSet.getUserId() != userInfo.getId()) {
             throw new RestForbiddenException();
         }
-
-        return cardService.findAllByCardSetId(cardSetId)
-                .stream().map(cardMapper::mapToDto)
-                .collect(Collectors.toList());
     }
 
 
@@ -127,6 +137,34 @@ public class CardController {
         cardList.sort(Comparator.comparing(Card::getId));
 
         return cardList;
+    }
+
+    /**
+     * GET Request: retrieving {@link AlternativeAnswer} to a specific card as DTO.
+     * @return List of AlternativeAnswer
+     */
+    @GET
+    @Path("/{cardId}/{cardSide}")
+    public List<AlternativeAnswerDto> alternativeAnswersOfCard(
+        @PathParam("cardSetId") long cardSetId,
+        @PathParam("cardId") long cardId,
+        @PathParam("cardSide") String cardSide
+    ) {
+        assertCardSetIsOwnedByUser(cardSetId);
+
+
+        Card cardWithAlternatives = cardService.findByIdAndFetchAlternatives(cardId);
+
+        List<AlternativeAnswer> alternatives;
+        if ("back".equalsIgnoreCase(cardSide)) {
+            alternatives = cardWithAlternatives.getAlternativeAnswersForBackSide();
+        } else {
+            alternatives = cardWithAlternatives.getAlternativeAnswersForFrontSide();
+        }
+
+        return alternatives.stream()
+            .map(alternativeAnswerMapper::mapToDto)
+            .toList();
     }
 
 

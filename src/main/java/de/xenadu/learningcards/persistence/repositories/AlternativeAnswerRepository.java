@@ -1,7 +1,6 @@
 package de.xenadu.learningcards.persistence.repositories;
 
 import de.xenadu.learningcards.persistence.entities.AlternativeAnswer;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import java.util.HashMap;
 import java.util.List;

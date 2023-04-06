@@ -19,7 +19,7 @@ class AnswerAuditorTest {
     void setUp() {
         cardService = Mockito.mock(CardService.class);
 
-        Mockito.when(cardService.findByIdAndFetchAlternatives(any()))
+        Mockito.when(cardService.findByIdAndFetchAlternatives(any(Long.class)))
             .thenAnswer(inv -> inv.getArgument(0));
     }
 
