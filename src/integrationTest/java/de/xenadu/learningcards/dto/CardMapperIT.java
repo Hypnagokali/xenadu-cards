@@ -8,6 +8,7 @@ import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.entities.HelpfulLink;
 import de.xenadu.learningcards.persistence.mapper.*;
+import de.xenadu.learningcards.persistence.repositories.AlternativeAnswerRepository;
 import de.xenadu.learningcards.persistence.repositories.CardRepository;
 import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
 import de.xenadu.learningcards.service.CardService;
@@ -26,9 +27,11 @@ public class CardMapperIT {
     CardService cardService;
     CardSetService cardSetService;
 
+    AlternativeAnswerRepository alternativeAnswerRepository;
+
     @BeforeEach
     public void setUp() throws Exception {
-        cardService = new CardService(produceCardRepository());
+        cardService = new CardService(produceCardRepository(), alternativeAnswerRepository);
         cardSetService = new CardSetService(produceCardSetRepository(), null);
 
         HelpfulLinkMapper helpfulLinkMapper = new HelpfulLinkMapperImpl();

@@ -15,21 +15,24 @@ class AnswerAuditorTest {
 
     CardService cardService;
 
+    Card testCard;
+
     @BeforeEach
     void setUp() {
         cardService = Mockito.mock(CardService.class);
+        testCard = new Card("Meine Mutter trink saft", "Моя мама пьёт сок");
 
         Mockito.when(cardService.findByIdAndFetchAlternatives(any(Long.class)))
-            .thenAnswer(inv -> inv.getArgument(0));
+            .thenReturn(testCard);
     }
 
     @Test
     void whenTheAnswerContainsWhitespacesButIsCorrectAsAWhole_ExpectResultIsCorrect() {
         AnswerAuditor auditor = new WordByWordAnswerAuditor(cardService);
-        Card card = new Card("Meine Mutter trink saft", "Моя мама пьёт сок");
+
         String myAnswer = "  Моя    Мама пьёт сок   ";
 
-        AnswerResult answerResult = auditor.checkResult(new AnswerRequest(myAnswer, true), card);
+        AnswerResult answerResult = auditor.checkResult(new AnswerRequest(myAnswer, true), testCard);
 
         assertThat(answerResult.isCorrect()).isTrue();
     }
@@ -37,10 +40,9 @@ class AnswerAuditorTest {
     @Test
     void whenTheAnswerisNotCorrect_ExpectResultIsNotCorrect() {
         AnswerAuditor auditor = new WordByWordAnswerAuditor(cardService);
-        Card card = new Card("Meine Mutter trink saft", "Моя мама пьёт сок");
         String myAnswer = "Моя Мама пёт сок";
 
-        AnswerResult answerResult = auditor.checkResult(new AnswerRequest(myAnswer, true), card);
+        AnswerResult answerResult = auditor.checkResult(new AnswerRequest(myAnswer, true), testCard);
 
         assertThat(answerResult.isCorrect()).isFalse();
     }
