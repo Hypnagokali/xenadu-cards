@@ -1,16 +1,24 @@
 package de.xenadu.learningcards.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
-
-import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -51,11 +59,6 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     @Column(columnDefinition = "TEXT DEFAULT ''")
     private String hint = "";
     private LocalDateTime lastLearned = initDate();
-
-    private static LocalDateTime initDate() {
-        return LocalDateTime.of(1800, 1, 1, 0, 0);
-    }
-
     @ManyToOne
     @JoinColumn(name = "card_set_id")
     @JsonIgnore
@@ -85,9 +88,14 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
         }
     }
 
-    public Card(String front, String back, int repState, LocalDateTime lastLearned, boolean lastAnswerWasCorrect) {
+    public Card(String front, String back, int repState, LocalDateTime lastLearned,
+                boolean lastAnswerWasCorrect) {
         this(front, back, repState, lastLearned);
         this.lastResultWasCorrect = lastAnswerWasCorrect;
+    }
+
+    private static LocalDateTime initDate() {
+        return LocalDateTime.of(1800, 1, 1, 0, 0);
     }
 
     public void addLink(HelpfulLink helpfulLink) {
@@ -100,11 +108,9 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     }
 
     public void resetRepState() {
-        if (repetitionState > 0) {
-            repetitionState = 1;
-        } else {
-            repetitionState = 0;
-        }
+        // repState = 0 is only for new cards
+        // reState = 1 means: card already seen
+        repetitionState = 1;
     }
 
     /**

@@ -57,6 +57,8 @@ public class CardRepository implements PanacheRepository<Card> {
             } else {
                 cards.sort(Comparator.comparing(Card::getLastLearned));
             }
+
+            cards.sort(Comparator.comparing(Card::isLastResultWasCorrect));
             return cards;
         }
 
