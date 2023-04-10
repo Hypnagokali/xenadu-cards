@@ -10,6 +10,7 @@ import de.xenadu.learningcards.persistence.repositories.CardSetRepository;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -28,12 +29,16 @@ public class LessonServiceIT {
     CardSetRepository cardSetRepository;
 
     @Inject
+    CardService cardService;
+
+    @Inject
     EntityManager em;
 
     @Inject
     GetUserInfo getUserInfo;
 
     CardSet testCardSet;
+    CardSet anotherUsersCardSet;
 
     @BeforeAll
     static void beforeAll() {
@@ -47,6 +52,7 @@ public class LessonServiceIT {
     @Transactional
     public void setUp() {
         testCardSet = new CardSet(0, "Test CardSet");
+        testCardSet.setUser(testUserInfo());
         Card card1 = new Card("card1", "Karte 1");
         Card card2 = new Card("card2", "Karte 2");
         Card card3 = new Card("card3", "Karte 3");
@@ -54,6 +60,15 @@ public class LessonServiceIT {
         testCardSet.addCard(card2);
         testCardSet.addCard(card3);
         cardSetRepository.persist(testCardSet);
+
+        // Another users CardSet:
+        anotherUsersCardSet = new CardSet(0, "Another CardSet");
+        anotherUsersCardSet.setUser(anotherUserInfo());
+        cardSetRepository.persist(anotherUsersCardSet);
+    }
+
+    private UserInfo anotherUserInfo() {
+        return new UserInfo(88888, "another@example.org", "an", "other");
     }
 
     private static UserInfo testUserInfo() {
@@ -70,7 +85,7 @@ public class LessonServiceIT {
 
     @Test
     void addCardsToLessonTest() {
-        Lesson createdLesson = createNewLession();
+        Lesson createdLesson = createNewLesson();
         Card card2 = testCardSet.getCards().stream()
             .filter(c -> c.getFront().equals("card2"))
             .findAny()
@@ -82,10 +97,49 @@ public class LessonServiceIT {
 
         Lesson lesson = lessonService.findByIdWithCards(createdLesson.getId());
 
-        assertThat(lesson.getCards()).hasSize(1);
+        assertThat(lesson.getCards()).hasSize(1)
+            .anyMatch(c -> c.getFront().equals("card2"));
     }
 
-    private Lesson createNewLession() {
+    @Test
+    void findAllLessonsForAuthenticatedUserTest() {
+        createNewLesson();
+        createAnotherLesson();
+        em.clear();
+
+        List<Lesson> lessons = lessonService.findAllByUserId(testUserInfo().getId());
+
+        assertThat(lessons).anyMatch(l -> l.getName().equals("Lesson 2"));
+    }
+
+    @Test
+    void whenDeletingLesson_ExpectCardsAreNotAffected() {
+        Lesson newLesson = createNewLesson();
+        Card card2 = testCardSet.getCards().stream()
+            .filter(c -> c.getFront().equals("card2"))
+            .findAny()
+            .get();
+
+        newLesson.addCard(card2);
+        lessonService.save(newLesson);
+        em.clear();
+
+        lessonService.deleteById(newLesson.getId());
+
+        Optional<Card> cardOfLesson = cardService.findById(card2.getId());
+
+        assertThat(cardOfLesson).isNotEmpty();
+    }
+
+    private Lesson createAnotherLesson() {
+        Lesson lesson = new Lesson("Lesson 3");
+        lesson.setCardSet(anotherUsersCardSet);
+        lessonService.save(lesson);
+
+        return lesson;
+    }
+
+    private Lesson createNewLesson() {
         Lesson lesson = new Lesson("Lesson 2");
         lesson.setCardSet(testCardSet);
         lessonService.save(lesson);
