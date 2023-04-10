@@ -1,9 +1,15 @@
 package de.xenadu.learningcards.persistence.entities;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,9 +34,23 @@ public class Lesson extends CreatedByAndTimestampAudit implements AbstractEntity
 
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "card_set_id")
+    private CardSet cardSet;
 
+
+    @ManyToMany
+    @JoinTable(
+        joinColumns = @JoinColumn(name = "lesson_id"),
+        inverseJoinColumns = @JoinColumn(name = "card_id")
+    )
+    private Set<Card> cards = new LinkedHashSet<>();
 
     public Lesson(String name) {
         this.name = name;
+    }
+
+    public void addCard(Card card) {
+        this.cards.add(card);
     }
 }
