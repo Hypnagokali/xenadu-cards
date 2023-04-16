@@ -1,5 +1,6 @@
 package de.xenadu.learningcards.dto;
 
+import de.xenadu.learningcards.persistence.entities.Lesson;
 import java.util.List;
 
 /**
@@ -10,4 +11,14 @@ import java.util.List;
  * @param cardSetId Belonging cardSe.
  * @param cards Number of cards in lesson.
  */
-public record LessonDto(long id, String name, long cardSetId, int cards){}
+public record LessonDto(long id, String name, long cardSetId, int cards) implements AbstractDto {
+
+    public LessonDto(Lesson lesson, long cardSetId) {
+        this(lesson.getId(), lesson.getName(), cardSetId, lesson.getCards().size());
+    }
+
+    @Override
+    public long getId() {
+        return id();
+    }
+}

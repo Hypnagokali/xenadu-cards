@@ -10,7 +10,7 @@ public interface LessonService {
 
     void save(Lesson lesson);
 
-    Lesson findById(long id);
+    Lesson findByIdOrThrow(long id);
 
     Lesson findByIdWithCards(long id);
 

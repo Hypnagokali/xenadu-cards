@@ -55,4 +55,5 @@ public class CardSet extends CreatedByAndTimestampAudit implements AbstractEntit
             this.cards.add(card);
         }
     }
+
 }

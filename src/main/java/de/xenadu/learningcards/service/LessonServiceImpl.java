@@ -23,7 +23,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public Lesson findById(long id) {
+    public Lesson findByIdOrThrow(long id) {
         return lessonRepository.findByIdOptional(id)
             .orElseThrow(() -> notFound(id));
     }
