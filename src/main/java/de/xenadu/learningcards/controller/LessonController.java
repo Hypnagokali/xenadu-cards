@@ -9,13 +9,11 @@ import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.CardSet;
 import de.xenadu.learningcards.persistence.entities.Lesson;
 import de.xenadu.learningcards.persistence.mapper.CardMapper;
-import de.xenadu.learningcards.persistence.mapper.CardSetMapper;
 import de.xenadu.learningcards.persistence.mapper.LessonMapper;
 import de.xenadu.learningcards.service.CardService;
 import de.xenadu.learningcards.service.CardSetService;
 import de.xenadu.learningcards.service.GetUserInfo;
 import de.xenadu.learningcards.service.LessonService;
-import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -89,8 +87,7 @@ public class LessonController {
      * Retrieves all cards in a card set that belong to a specific lesson.
      *
      * @param cardSetId ID of current card set.
-     * @param lessonId ID of lesson.
-     *
+     * @param lessonId  ID of lesson.
      * @return CardDto list of cards.
      */
     @GET
@@ -150,7 +147,7 @@ public class LessonController {
     /**
      * Create a new learn session for given card set.
      *
-     * @param cardSetId ID of card set in which the lesson is to be created.
+     * @param cardSetId ID of card set in which the lesson will be created in.
      * @param lessonDto The lesson send over http.
      * @return Saved lesson as DTO.
      */
@@ -176,15 +173,17 @@ public class LessonController {
 
 
     /**
-     * Assign an existing card to a lesson.
+     * Assigns an existing card to a lesson.
      *
-     * @param cardSetId ID of card set in which the lesson is to be created.
-     * @return Saved lesson as DTO.
+     * @param cardSetId ID of card set in which the lesson can be found.
+     * @param cardId    ID of Card that should be assigned to the lesson.
+     * @param lessonId  ID of the lesson.
      */
     @POST
     @Path("/{lessonId}/assign/{cardId}")
     @ResponseStatus(204)
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public void assignCardToLesson(
         @PathParam("cardSetId") long cardSetId,
         @PathParam("lessonId") long lessonId,
@@ -194,22 +193,51 @@ public class LessonController {
 
         Card card = cardService.findById(cardId)
             .orElseThrow(RestBadRequestException::new);
-        Lesson lesson = lessonService.findByIdWithCards(lessonId);
+        Lesson lesson = lessonService.findByIdOrThrow(lessonId);
 
         if (card.getCardSet().getId() != cardSetId
             || lesson.getCardSet().getId() != cardSetId) {
             throw new RestBadRequestException();
         }
 
-        lesson.addCard(card);
-
-        lessonService.save(lesson);
+        lessonService.assignCardToLesson(card, lesson);
     }
 
     /**
+     * Removes a card from a lesson.
      *
+     * @param cardSetId ID of card set in which the lesson can be found.
+     * @param cardId    ID of card that should be removed from the lesson.
+     * @param lessonId  ID of the lesson.
+     */
+    @POST
+    @Path("/{lessonId}/remove/{cardId}")
+    @ResponseStatus(204)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void removeCardFromLesson(
+        @PathParam("cardSetId") long cardSetId,
+        @PathParam("lessonId") long lessonId,
+        @PathParam("cardId") long cardId) {
+
+        assertCardSetBelongsToUser(cardSetId);
+
+        Card card = cardService.findById(cardId)
+            .orElseThrow(RestBadRequestException::new);
+        Lesson lesson = lessonService.findByIdOrThrow(lessonId);
+
+        if (card.getCardSet().getId() != cardSetId
+            || lesson.getCardSet().getId() != cardSetId) {
+            throw new RestBadRequestException();
+        }
+
+        lessonService.removeCardFromLesson(card, lesson);
+    }
+
+
+    /**
      * @param cardSetId ID of CardSet
-     * @param lessonId ID of Lesson to be deleted
+     * @param lessonId  ID of Lesson to be deleted
      */
     @DELETE
     @Path("/{lessonId}")
