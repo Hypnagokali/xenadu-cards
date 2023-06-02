@@ -125,10 +125,12 @@ public class CardRepository implements PanacheRepository<Card> {
      * @return Optional with a card if found, empty else.
      */
     public Optional<Card> findByIdAndFetchLessons(long cardId) {
-        return find("""
-                SELECT DISTINCT c FROM Card c
-                LEFT JOIN FETCH c.lessons
-                WHERE c.id = ?1
-            """, cardId).firstResultOptional();
+        return Optional.ofNullable(getEntityManager().createQuery("""
+                    SELECT DISTINCT c FROM Card c
+                    LEFT JOIN FETCH c.lessons
+                    WHERE c.id = ?1
+                """, Card.class)
+            .setParameter(1, cardId)
+            .getSingleResult());
     }
 }

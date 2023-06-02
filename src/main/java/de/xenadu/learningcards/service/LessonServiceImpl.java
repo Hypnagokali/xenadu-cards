@@ -69,7 +69,6 @@ public class LessonServiceImpl implements LessonService {
         loadedLesson.addCard(loadedCard);
 
         lessonRepository.save(loadedLesson);
-
     }
 
     @Override
