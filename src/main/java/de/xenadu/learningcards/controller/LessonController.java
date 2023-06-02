@@ -236,6 +236,8 @@ public class LessonController {
 
 
     /**
+     * Deletes a lesson.
+     *
      * @param cardSetId ID of CardSet
      * @param lessonId  ID of Lesson to be deleted
      */

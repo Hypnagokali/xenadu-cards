@@ -1,12 +1,13 @@
 package de.xenadu.learningcards.service;
 
 import de.xenadu.learningcards.exceptions.EntityNotFoundException;
-import de.xenadu.learningcards.persistence.entities.AlternativeAnswer;
 import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.HelpfulLink;
+import de.xenadu.learningcards.persistence.entities.Lesson;
 import de.xenadu.learningcards.persistence.projections.RepStateCount;
 import de.xenadu.learningcards.persistence.repositories.AlternativeAnswerRepository;
 import de.xenadu.learningcards.persistence.repositories.CardRepository;
+import de.xenadu.learningcards.persistence.repositories.LessonRepository;
 import de.xenadu.learningcards.util.RepetitionStateMapping;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -24,10 +25,14 @@ import lombok.NoArgsConstructor;
 public class CardService {
 
     private CardRepository cardRepository;
+    private LessonRepository lessonRepository;
     private AlternativeAnswerRepository alternativeAnswerRepository;
 
     @Inject
-    public CardService(CardRepository cardRepository, AlternativeAnswerRepository alternativeAnswerRepository) {
+    public CardService(CardRepository cardRepository,
+                       AlternativeAnswerRepository alternativeAnswerRepository,
+                       LessonRepository lessonRepository) {
+        this.lessonRepository = lessonRepository;
         this.cardRepository = cardRepository;
         this.alternativeAnswerRepository = alternativeAnswerRepository;
     }
@@ -63,6 +68,16 @@ public class CardService {
 
     @Transactional
     public void deleteCardById(long id) {
+        Card card = cardRepository.findByIdAndFetchLessons(id)
+            .orElseThrow(() -> new EntityNotFoundException("Card not found. ID = " + id));
+
+        List<Lesson> lessons = lessonRepository.findByCardIdAndFetchCards(id);
+
+        for (Lesson lesson : lessons) {
+            lesson.removeCard(card);
+            lessonRepository.save(lesson);
+        }
+
         cardRepository.deleteById(id);
     }
 

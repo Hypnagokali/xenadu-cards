@@ -109,14 +109,13 @@ public class CardRepository implements PanacheRepository<Card> {
     }
 
     public List<Card> findAllByCardSetIdAndLessonId(long cardSetId, long lessonId) {
-        return find("""
+        return getEntityManager().createQuery("""
                     SELECT DISTINCT c FROM Card c
                     LEFT JOIN c.lessons l
                     WHERE c.cardSet.id = ?1 AND l.id = ?2
-                """,
-            cardSetId,
-            lessonId
-        ).list();
+                """, Card.class)
+            .setParameter(1, cardSetId)
+            .setParameter(2, lessonId).getResultList();
     }
 
     /**

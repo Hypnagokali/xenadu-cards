@@ -55,7 +55,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<Lesson> findAllByCardId(long cardId) {
-        return lessonRepository.findByCardId(cardId);
+        return lessonRepository.findByCardIdAndFetchCards(cardId);
     }
 
     @Override

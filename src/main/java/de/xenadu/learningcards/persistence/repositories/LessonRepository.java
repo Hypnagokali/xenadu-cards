@@ -70,7 +70,7 @@ public class LessonRepository extends CrudRepository<Lesson> {
      *
      * @return List of lessons.
      */
-    public List<Lesson> findByCardId(long cardId) {
+    public List<Lesson> findByCardIdAndFetchCards(long cardId) {
         return find("""
             SELECT DISTINCT l FROM Lesson l
             LEFT JOIN FETCH l.cards
@@ -78,4 +78,5 @@ public class LessonRepository extends CrudRepository<Lesson> {
             WHERE c.id = ?1
             """, cardId).list();
     }
+
 }
