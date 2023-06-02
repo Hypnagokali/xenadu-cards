@@ -107,4 +107,29 @@ public class CardRepository implements PanacheRepository<Card> {
             .setParameter(1, id)
             .getSingleResult());
     }
+
+    public List<Card> findAllByCardSetIdAndLessonId(long cardSetId, long lessonId) {
+        return find("""
+                    SELECT DISTINCT c FROM Card c
+                    LEFT JOIN c.lessons l
+                    WHERE c.cardSet.id = ?1 AND l.id = ?2
+                """,
+            cardSetId,
+            lessonId
+        ).list();
+    }
+
+    /**
+     * Retrieves a Card with all lessons associated with.
+     *
+     * @param cardId ID of Card.
+     * @return Optional with a card if found, empty else.
+     */
+    public Optional<Card> findByIdAndFetchLessons(long cardId) {
+        return find("""
+                SELECT DISTINCT c FROM Card c
+                LEFT JOIN FETCH c.lessons
+                WHERE c.id = ?1
+            """, cardId).firstResultOptional();
+    }
 }

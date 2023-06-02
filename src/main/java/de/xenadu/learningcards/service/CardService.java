@@ -135,4 +135,8 @@ public class CardService {
     public void removeAlternativeAnswerById(long cardId, long alternativeId) {
         alternativeAnswerRepository.deleteById(alternativeId);
     }
+
+    public List<Card> findAllByCardSetIdAndLessonId(long cardSetId, long lessonId) {
+        return cardRepository.findAllByCardSetIdAndLessonId(cardSetId, lessonId);
+    }
 }

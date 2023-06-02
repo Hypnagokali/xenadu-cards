@@ -29,7 +29,7 @@ public class Lesson extends CreatedByAndTimestampAudit implements AbstractEntity
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = GENERATOR)
-    @SequenceGenerator(name = GENERATOR, sequenceName = GENERATOR)
+    @SequenceGenerator(name = GENERATOR, sequenceName = GENERATOR, allocationSize = 1)
     private long id;
 
     private String name;
@@ -37,7 +37,6 @@ public class Lesson extends CreatedByAndTimestampAudit implements AbstractEntity
     @ManyToOne
     @JoinColumn(name = "card_set_id")
     private CardSet cardSet;
-
 
     @ManyToMany
     @JoinTable(
@@ -52,5 +51,10 @@ public class Lesson extends CreatedByAndTimestampAudit implements AbstractEntity
 
     public void addCard(Card card) {
         this.cards.add(card);
+    }
+
+    public void removeCard(Card card) {
+        this.cards.remove(card);
+        card.getLessons().remove(this);
     }
 }

@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -63,6 +64,9 @@ public class Card extends CreatedByAndTimestampAudit implements AbstractEntity {
     @JoinColumn(name = "card_set_id")
     @JsonIgnore
     private CardSet cardSet;
+
+    @ManyToMany(mappedBy = "cards")
+    private Set<Lesson> lessons = new LinkedHashSet<>();
 
     public Card(String front, String back) {
         this.front = front;

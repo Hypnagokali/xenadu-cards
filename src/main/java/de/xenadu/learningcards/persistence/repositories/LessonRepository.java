@@ -62,4 +62,20 @@ public class LessonRepository extends CrudRepository<Lesson> {
             .setParameter(1, cardSetId)
             .getResultList();
     }
+
+    /**
+     * Find all lessons by a single card.
+     *
+     * @param cardId ID of card.
+     *
+     * @return List of lessons.
+     */
+    public List<Lesson> findByCardId(long cardId) {
+        return find("""
+            SELECT DISTINCT l FROM Lesson l
+            LEFT JOIN FETCH l.cards
+            LEFT JOIN l.cards c
+            WHERE c.id = ?1
+            """, cardId).list();
+    }
 }

@@ -91,14 +91,54 @@ public class LessonServiceIT {
             .findAny()
             .get();
 
-        createdLesson.addCard(card2);
-        lessonService.save(createdLesson);
+        lessonService.assignCardToLesson(card2, createdLesson);
         em.clear();
 
         Lesson lesson = lessonService.findByIdWithCards(createdLesson.getId());
 
         assertThat(lesson.getCards()).hasSize(1)
             .anyMatch(c -> c.getFront().equals("card2"));
+    }
+
+    @Test
+    void removeCardFromLessonTest() {
+        Lesson createdLesson = createNewLesson();
+        Card card2 = testCardSet.getCards().stream()
+            .filter(c -> c.getFront().equals("card2"))
+            .findAny()
+            .get();
+
+        lessonService.assignCardToLesson(card2, createdLesson);
+        em.clear();
+
+        lessonService.removeCardFromLesson(card2, createdLesson);
+
+        Lesson lesson = lessonService.findByIdWithCards(createdLesson.getId());
+
+        assertThat(lesson.getCards()).hasSize(0);
+    }
+
+    @Test
+    void findLessonsByCardId() {
+        Lesson createdLesson = createNewLesson();
+        Lesson anotherLesson = createAnotherLesson();
+
+        Card card2 = testCardSet.getCards().stream()
+            .filter(c -> c.getFront().equals("card2"))
+            .findAny()
+            .get();
+
+        createdLesson.addCard(card2);
+        anotherLesson.addCard(card2);
+
+        lessonService.save(createdLesson);
+        lessonService.save(anotherLesson);
+
+        em.clear();
+
+        List<Lesson> allByCardId = lessonService.findAllByCardId(card2.getId());
+
+        assertThat(allByCardId).hasSize(2);
     }
 
     @Test

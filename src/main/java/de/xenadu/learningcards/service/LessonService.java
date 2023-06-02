@@ -1,5 +1,6 @@
 package de.xenadu.learningcards.service;
 
+import de.xenadu.learningcards.persistence.entities.Card;
 import de.xenadu.learningcards.persistence.entities.Lesson;
 import java.util.List;
 
@@ -19,4 +20,10 @@ public interface LessonService {
     List<Lesson> findAllByCardSetId(long cardSetId);
 
     void deleteById(long id);
+
+    List<Lesson> findAllByCardId(long cardId);
+
+    void assignCardToLesson(Card card, Lesson lesson);
+
+    void removeCardFromLesson(Card card, Lesson lesson);
 }
