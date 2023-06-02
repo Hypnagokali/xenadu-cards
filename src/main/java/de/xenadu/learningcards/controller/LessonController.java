@@ -73,8 +73,8 @@ public class LessonController {
         @PathParam("lessonId") long lessonId) {
         CardSet cardSet = assertCardSetBelongsToUser(cardSetId);
 
-        Lesson lesson =
-            assertLessonBelongsToCardSet(lessonId, cardSet);
+        assertLessonBelongsToCardSet(lessonId, cardSet);
+        Lesson lesson = lessonService.findByIdWithCards(lessonId);
 
         if (lesson.getCardSet().getId() != cardSetId) {
             throw new RestForbiddenException();
